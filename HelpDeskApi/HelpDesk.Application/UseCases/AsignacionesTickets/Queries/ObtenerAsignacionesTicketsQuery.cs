@@ -1,40 +1,46 @@
-﻿using Microsoft.Extensions.Logging;
+using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
-using HelpDesk.Application.UseCases.AsignacionesTickets.Dtos;
+using HelpDesk.Domain.Dtos.AsignacionesTickets;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
 namespace HelpDesk.Application.UseCases.AsignacionesTickets;
 
-public record ObtenerAsignacionesTicketsQuery(object[] Keys) : IRequest<ResponseDto<AsignacionesTicketsResponseDto>>;
+public class ObtenerAsignacionesTicketsQuery : IRequest<ResponseDto<AsignacionesTicketsResponseDto>>
+{
+    public Guid IdAsignacionTicket { get; set; }
+}
 
-internal sealed class ObtenerAsignacionesTicketsQueryHandler(IUnitOfWork _unitOfWork, AccessRules access, ILogger<ObtenerAsignacionesTicketsQueryHandler> _logger) : IRequestHandler<ObtenerAsignacionesTicketsQuery, ResponseDto<AsignacionesTicketsResponseDto>>
+internal sealed class ObtenerAsignacionesTicketsQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ObtenerAsignacionesTicketsQuery, ResponseDto<AsignacionesTicketsResponseDto>>
 {
     public async Task<ResponseDto<AsignacionesTicketsResponseDto>> Handle(ObtenerAsignacionesTicketsQuery request, CancellationToken ct)
     {
         try
         {
-            var entity=await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesTickets>().FindAsync(request.Keys, ct)
-            ?? throw new BusinessException(404,"Registro no encontrado.");
+            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesTickets>().GetByIdAsync(request.IdAsignacionTicket)
+            ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
-            return new(200,new AsignacionesTicketsResponseDto { IdAsignacionTicket = entity.IdAsignacionTicket, IdTicket = entity.IdTicket, IdEquipo = entity.IdEquipo, IdTecnico = entity.IdTecnico, IdAsignador = entity.IdAsignador, FechaAsignacion = entity.FechaAsignacion, FechaFin = entity.FechaFin, Motivo = entity.Motivo });
+            return new ResponseDto<AsignacionesTicketsResponseDto>(200, new AsignacionesTicketsResponseDto
+            {
+                IdAsignacionTicket = entity.IdAsignacionTicket,
+                IdTicket = entity.IdTicket,
+                IdEquipo = entity.IdEquipo,
+                IdTecnico = entity.IdTecnico,
+                IdAsignador = entity.IdAsignador,
+                FechaAsignacion = entity.FechaAsignacion,
+                FechaFin = entity.FechaFin,
+                Motivo = entity.Motivo
+            });
         }
         catch (BusinessException ex)
         {
-            if (ex.Status >= 500)
-                _logger.LogError(ex, "Error controlado en ObtenerAsignacionesTicketsQueryHandler.");
-            return new(ex.Status, default, ex.Message);
+            return new ResponseDto<AsignacionesTicketsResponseDto>(ex.Status, default, ex.Message);
         }
-        catch (OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error al ejecutar ObtenerAsignacionesTicketsQueryHandler.");
-            return new(500, default, "No se pudo completar la operacion.");
+            return new ResponseDto<AsignacionesTicketsResponseDto>(500, default, "No se pudo completar la operacion.");
         }
     }
 
