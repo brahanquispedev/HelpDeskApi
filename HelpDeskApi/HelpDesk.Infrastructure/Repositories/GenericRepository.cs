@@ -1,33 +1,34 @@
-﻿using HelpDesk.Domain.Ports;
+using System.Linq.Expressions;
+using HelpDesk.Domain.Ports;
 using HelpDesk.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace HelpDesk.Infrastructure.Repositories;
 
-public sealed class GenericRepository<T>(HelpDeskDbContext context,string? setName=null):IGenericRepository<T> where T:class
-
+public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
-    private DbSet<T> Set => setName is null ? context.Set<T>():context.Set<T>(setName);
+    private readonly DbSet<T> _entities;
 
-    public IQueryable<T> Query()
+    public GenericRepository(HelpDeskDbContext context, string? setName = null)
     {
-        return Set;
+        // Solo las cuatro tablas puente del scaffolding necesitan un nombre de conjunto.
+        _entities = setName is null ? context.Set<T>() : context.Set<T>(setName);
     }
 
-    public async Task<T?> FindAsync(object[] keys, CancellationToken ct)
-    {
-        return await  Set.FindAsync(keys, ct);
-    }
+    public IQueryable<T> Query() => _entities;
 
-    public void Add(T entity)
-    {
-        Set.Add(entity);
-    }
+    public async Task<IEnumerable<T>> GetAllAsync()
+        => await _entities.AsNoTracking().ToListAsync();
 
-    public void Remove(T entity)
-    {
-        Set.Remove(entity);
-    }
+    public async Task<T?> GetByIdAsync(params object[] ids)
+        => await _entities.FindAsync(ids);
 
+    public Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
+        => _entities.AsNoTracking().FirstOrDefaultAsync(predicate);
+
+    public async Task AddAsync(T entity) => await _entities.AddAsync(entity);
+
+    public void Update(T entity) => _entities.Update(entity);
+
+    public void Delete(T entity) => _entities.Remove(entity);
 }
-
