@@ -6,5 +6,11 @@ public class SmokeTests
     public void Test1()
     {
 
+    [Fact]
+    public void SumaBasica_EsCorrecta()
+    {
+        Assert.Equal(2, 1 + 1);
+    }
+
     }
 }
