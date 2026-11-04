@@ -19,6 +19,7 @@ public static class ApiServicesExtensions
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
+        app.MapHealthChecks("/health");
         return app;
     }
 }
