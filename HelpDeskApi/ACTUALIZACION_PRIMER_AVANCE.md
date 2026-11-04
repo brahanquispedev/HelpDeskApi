@@ -28,7 +28,7 @@ Los contratos de seguridad de Domain están en archivos separados. JwtService y 
 
 ## Estado de la API
 
-Los controladores de Tickets y AsignacionesTickets ya estan integrados en Program.cs mediante AddApplicationServices/AddInfrastructureServices/AddApiServices. El flujo HTTP esta disponible con autenticacion JWT. Las esperas, reanudaciones, reaperturas, cancelaciones y reasignaciones quedan para la siguiente entrega.
+Los controladores de Tickets y AsignacionesTickets ya estan integrados en Program.cs mediante AddApplicationServices/AddInfrastructureServices/AddApiServices. El flujo HTTP esta disponible con autenticacion JWT. Las esperas, reanudaciones, reaperturas, cancelaciones y reasignaciones quedan para la siguiente entrega. Se agrego health check en /health y proyecto de pruebas xUnit.
 
 ## Compilar
 
