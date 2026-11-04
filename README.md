@@ -100,3 +100,7 @@ El repositorio de referencia y este repositorio de trabajo tienen propósitos di
 ```powershell
 dotnet test .\HelpDeskApi\HelpDesk.Tests\HelpDesk.Tests.csproj
 ```
+
+## Health check
+
+`GET /health` devuelve el estado de la API.
