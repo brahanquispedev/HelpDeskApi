@@ -8,8 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelpDesk.Domain", "HelpDesk
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelpDesk.Infrastructure", "HelpDesk.Infrastructure\HelpDesk.Infrastructure.csproj", "{7DD55628-F677-4719-89A6-26BBC3EEEFA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelpDesk.Tests", "HelpDesk.Tests\HelpDesk.Tests.csproj", "{3AF17B99-3F8F-493C-BC86-E65155B7F383}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,18 +66,6 @@ Global
 		{7DD55628-F677-4719-89A6-26BBC3EEEFA2}.Release|x64.Build.0 = Release|Any CPU
 		{7DD55628-F677-4719-89A6-26BBC3EEEFA2}.Release|x86.ActiveCfg = Release|Any CPU
 		{7DD55628-F677-4719-89A6-26BBC3EEEFA2}.Release|x86.Build.0 = Release|Any CPU
-		{3AF17B99-3F8F-493C-BC86-E65155B7F383}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3AF17B99-3F8F-493C-BC86-E65155B7F383}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3AF17B99-3F8F-493C-BC86-E65155B7F383}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{3AF17B99-3F8F-493C-BC86-E65155B7F383}.Debug|x64.Build.0 = Debug|Any CPU
-		{3AF17B99-3F8F-493C-BC86-E65155B7F383}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3AF17B99-3F8F-493C-BC86-E65155B7F383}.Debug|x86.Build.0 = Debug|Any CPU
-		{3AF17B99-3F8F-493C-BC86-E65155B7F383}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3AF17B99-3F8F-493C-BC86-E65155B7F383}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3AF17B99-3F8F-493C-BC86-E65155B7F383}.Release|x64.ActiveCfg = Release|Any CPU
-		{3AF17B99-3F8F-493C-BC86-E65155B7F383}.Release|x64.Build.0 = Release|Any CPU
-		{3AF17B99-3F8F-493C-BC86-E65155B7F383}.Release|x86.ActiveCfg = Release|Any CPU
-		{3AF17B99-3F8F-493C-BC86-E65155B7F383}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
