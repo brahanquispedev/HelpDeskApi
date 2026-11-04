@@ -1,6 +1,6 @@
 ﻿namespace HelpDesk.Tests;
 
-public class UnitTest1
+public class SmokeTests
 {
     [Fact]
     public void Test1()
