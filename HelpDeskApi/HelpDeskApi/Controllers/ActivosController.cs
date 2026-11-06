@@ -19,19 +19,19 @@ public sealed class ActivosController(IMediator mediator) : ControllerBase
     [HttpGet("{idActivo:guid}")]
     public async Task<IActionResult> Get(Guid idActivo)
     {
-        var result = await mediator.Send(new ObtenerActivoQuery { IdActivo = idActivo });
+        var result = await mediator.Send(new ObtenerActivosQuery { IdActivo = idActivo });
         return StatusCode(result.StatusCode, result);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Crear([FromBody] CrearActivoCommand datos)
+    public async Task<IActionResult> Crear([FromBody] CrearActivosCommand datos)
     {
         var result = await mediator.Send(datos);
         return StatusCode(result.StatusCode, result);
     }
 
     [HttpPut("{idActivo:guid}")]
-    public async Task<IActionResult> Actualizar(Guid idActivo, [FromBody] ActualizarActivoCommand datos)
+    public async Task<IActionResult> Actualizar(Guid idActivo, [FromBody] ActualizarActivosCommand datos)
     {
         datos.IdActivo = idActivo;
         var result = await mediator.Send(datos);

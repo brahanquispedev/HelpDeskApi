@@ -1,31 +1,31 @@
+using HelpDesk.Domain.Dtos.Common;
+using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Activos;
-using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
-using ActivoEntity = HelpDesk.Domain.Models.Activos;
 using HelpDesk.Domain.Ports;
 using MediatR;
 
 namespace HelpDesk.Application.UseCases.Activos.Queries;
 
-public class ObtenerActivoQuery : IRequest<ResponseDto<ActivosResponseDto>>
+public class ObtenerActivosQuery : IRequest<ResponseDto<ActivosResponseDto>>
 {
     public Guid IdActivo { get; set; }
 }
 
-internal sealed class ObtenerActivoQueryHandler(IUnitOfWork _unitOfWork, AccessRules access)
-    : IRequestHandler<ObtenerActivoQuery, ResponseDto<ActivosResponseDto>>
+internal sealed class ObtenerActivosQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) 
+    : IRequestHandler<ObtenerActivosQuery, ResponseDto<ActivosResponseDto>>
 {
-    public async Task<ResponseDto<ActivosResponseDto>> Handle(ObtenerActivoQuery request, CancellationToken ct)
+    public async Task<ResponseDto<ActivosResponseDto>> Handle(ObtenerActivosQuery request, CancellationToken ct)
     {
         try
         {
-            var entity = await _unitOfWork.Repository<ActivoEntity>().GetByIdAsync([request.IdActivo])
-                ?? throw new BusinessException(404, "Activo no encontrado.");
-
+            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Activos>().GetByIdAsync(request.IdActivo)
+                         ?? throw new BusinessException(404, "Registro no encontrado.");
+                
             access.EnsureRead(entity);
-
+            
             return new ResponseDto<ActivosResponseDto>(200, new ActivosResponseDto
             {
                 IdActivo = entity.IdActivo,

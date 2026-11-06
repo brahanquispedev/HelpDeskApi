@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HelpDesk.Application.UseCases.Activos.Commands;
 
-public class CrearActivoCommand : IRequest<ResponseDto<ActivosResponseDto>>
+public class CrearActivosCommand : IRequest<ResponseDto<ActivosResponseDto>>
 {
     public Guid IdSede { get; set; }
     public Guid? IdArea { get; set; }
@@ -39,9 +39,9 @@ public class CrearActivoCommand : IRequest<ResponseDto<ActivosResponseDto>>
 }
 
 internal sealed class CrearActivoCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
-    : IRequestHandler<CrearActivoCommand, ResponseDto<ActivosResponseDto>>
+    : IRequestHandler<CrearActivosCommand, ResponseDto<ActivosResponseDto>>
 {
-    public async Task<ResponseDto<ActivosResponseDto>> Handle(CrearActivoCommand request, CancellationToken ct)
+    public async Task<ResponseDto<ActivosResponseDto>> Handle(CrearActivosCommand request, CancellationToken ct)
     {
         try
         {
