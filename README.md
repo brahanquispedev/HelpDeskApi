@@ -1,30 +1,61 @@
-# HelpDesk API — estructura base del equipo
+# HelpDesk API — proyecto del equipo
 
-Repositorio de trabajo del proyecto HelpDesk. El primer commit contiene la estructura compartida y el scaffolding de PostgreSQL para que los ocho integrantes implementen sus entidades desde una misma base.
+Sistema de soporte técnico desarrollado por un equipo de **seis integrantes**. Permite organizar solicitudes, asignarlas a equipos y técnicos, registrar su atención y consultar su historial y reportes.
 
-## Qué incluye esta base
+El backend utiliza **.NET 10, PostgreSQL, Entity Framework Core, MediatR y autenticación JWT**. El diseño de datos contempla **36 tablas y 2 vistas**.
+
+## Equipo y distribución actual
+
+| Integrante | Entidades y responsabilidades |
+|---|---|
+| **Diego Medina** | Autenticación, Usuarios, Roles, UsuariosRoles, Permisos, RolesPermisos y RecuperacionesClave. Coordina los flujos de acceso y la inicialización del administrador. |
+| **Gianfranco Paolo** | Cambios, CambiosTickets, TareasCambios, Aprobaciones, Problemas y ProblemasTickets. |
+| **Fernando Aquima** | Activos, TiposActivos, AsignacionesActivos, TicketsActivos, Comentarios y Adjuntos. |
+| **Stiven Yerai** | Sedes, Areas, EquiposSoporte, IntegrantesEquipo, Notificaciones, PreferenciasNotificaciones y EnviosNotificaciones. |
+| **Ederson Vilca** | Servicios, CategoriasServicios, PoliticasAtencion, Encuestas, ArticulosConocimiento, CategoriasConocimiento y TicketsArticulos. |
+| **Brahan Quispe** | Tickets, AsignacionesTickets, HistorialTickets, Auditoria, CargaTecnicos, ResumenTickets y Reportes. También coordina Domain compartido, Infrastructure, Common, reglas de acceso e integración de la API. |
+
+Cada responsable incorpora los **DTOs, casos de uso y controladores** de sus entidades en commits identificables. Los modelos generados, repositorios, UnitOfWork y servicios técnicos son componentes compartidos que se coordinan con Brahan.
+
+`Infrastructure/Services` contiene servicios técnicos, como JWT y hash, a cargo de Brahan. El módulo de negocio `Servicios`, que representa el catálogo de atenciones, corresponde a Ederson.
+
+La distribución exhaustiva de la primera versión está en la [guía de la plantilla](https://github.com/BrahanPRANK/HelpDeskApi/blob/main/HelpDeskBackend/DISTRIBUCION_EQUIPO.md). Esa guía distingue los archivos de la plantilla y los nombres de los proyectos del equipo; su inventario de avance corresponde a la fecha de revisión indicada allí.
+
+## Organización de la solución
 
 ```text
 HelpDeskApi/
 ├── HelpDeskApi.sln
-├── HelpDeskApi/              Proyecto de entrada de la API
-├── HelpDesk.Application/     Capa para comandos, consultas, handlers y DTOs
-├── HelpDesk.Domain/          Entidades generadas por scaffolding
-└── HelpDesk.Infrastructure/  DbContext y dependencias de persistencia
+├── HelpDeskApi/              Controladores, arranque y configuración de la API
+├── HelpDesk.Application/     Commands, Queries, handlers y reglas de acceso
+├── HelpDesk.Domain/          Modelos, DTOs, interfaces y excepciones
+├── HelpDesk.Infrastructure/  DbContext, repositorios, UnitOfWork y servicios
+└── scripts/                 Herramientas de apoyo, como scaffolding
 ```
 
-- Cuatro proyectos .NET 10 con sus referencias.
-- Paquetes de EF Core, PostgreSQL, MediatR, JWT y Swagger declarados en los proyectos.
-- Modelos en `HelpDesk.Domain/Models` y contexto en `HelpDesk.Infrastructure/Data`.
-- Configuración inicial de ASP.NET Core.
+El controlador recibe una petición y la envía a MediatR. El handler ejecuta el caso de uso, consulta o modifica entidades y construye el DTO de salida. Las escrituras se confirman mediante `IUnitOfWork.Complete()`.
 
-Los modelos corresponden al diseño de 36 tablas y 2 vistas. Hay 34 clases porque cuatro tablas de relación son representadas por EF dentro del contexto, sin clase independiente.
+Los DTOs se organizan en `HelpDesk.Domain/Dtos/{Entidad}`, uno por archivo. Los modelos y el contexto ya están incluidos. EF representa cuatro tablas de relación dentro del contexto, sin una clase independiente; por ello hay 34 clases generadas para las 36 tablas y las 2 vistas.
 
-**Esta estructura aún no implementa los CRUD, handlers, login/JWT ni middleware del proyecto final.** Tener sus librerías instaladas no significa que esas funcionalidades estén implementadas. `Program.cs` conserva el ejemplo inicial de ASP.NET Core; Swagger UI tampoco está configurado todavía.
+## Estado de la primera versión
+
+`main` contiene la base compartida y los aportes integrados mediante Pull Requests. Ya incluye casos de uso, DTOs y controladores de los módulos incorporados por el equipo; las responsabilidades de la tabla no significan que todas las funciones estén terminadas o verificadas.
+
+El flujo básico de Tickets es:
+
+```text
+nuevo → asignado → en_atencion → resuelto → cerrado
+```
+
+Asignaciones e historial se mantienen desde las acciones de Tickets. CargaTecnicos y ResumenTickets son recursos de consulta. Auditoria permite consultar los registros disponibles; el registro automático de auditoría queda para otra entrega.
+
+La configuración integrada de `Program.cs` utiliza `AddApplicationServices`, `AddInfrastructureServices`, `AddApiServices` y `UseApiPipeline`. Actualmente la configuración de API publica controladores y `/health`; la activación de Swagger UI y del middleware de excepciones debe completarse en la integración de arranque. Tener sus paquetes o clases presentes no implica que ya estén registrados en el pipeline.
+
+Esta versión no incluye frontend, proveedor real de correo ni carga física de archivos. Los adjuntos administran metadatos. La recuperación de contraseña y los flujos avanzados se coordinan para entregas posteriores.
 
 ## Clonar y compilar
 
-Instalar Git y .NET SDK 10.0. Para trabajar con la base se necesita PostgreSQL 16 o superior y el script SQL de 36 tablas acordado por el equipo.
+Requisitos: Git, .NET SDK 10.0 y PostgreSQL 16 o superior para utilizar la persistencia.
 
 ```powershell
 git clone https://github.com/brahanquispedev/HelpDeskApi.git
@@ -33,74 +64,69 @@ dotnet restore .\HelpDeskApi\HelpDeskApi.sln
 dotnet build .\HelpDeskApi\HelpDeskApi.sln
 ```
 
-Para ejecutar la aplicación inicial:
+## Preparar la base y la configuración local
+
+Cada integrante utiliza su propia base PostgreSQL. Debe crear `helpdeskdb` y aplicar el script de 36 tablas acordado por el equipo antes de ejecutar operaciones de persistencia. La API no crea ese esquema automáticamente.
+
+El SQL se comparte por el medio acordado con Brahan; actualmente no forma parte de este repositorio de trabajo. No utilizar el diseño histórico de 25 tablas.
+
+Configurar en User Secrets del proyecto `HelpDeskApi/HelpDeskApi` o mediante variables de entorno:
+
+- `ConnectionStrings:DefaultConnection`: conexión PostgreSQL de la computadora.
+- `Jwt:Key`: clave local de firma, de al menos 32 bytes.
+- `Jwt:Issuer`: emisor configurado para la API.
+- `Jwt:Audience`: audiencia configurada para los clientes.
+
+Los secretos de otra computadora no se transfieren al clonar. No escribir contraseñas, claves JWT ni tokens en archivos versionados.
+
+Para iniciar con el perfil de desarrollo HTTP:
 
 ```powershell
 dotnet run --project .\HelpDeskApi\HelpDeskApi --launch-profile http
 ```
 
-El perfil actual utiliza `http://localhost:5086`; el ejemplo inicial está en `/weatherforecast`. Los endpoints del negocio se incorporarán en las contribuciones de cada integrante.
+El perfil utiliza `http://localhost:5086`. `GET /health` expone el estado básico de la aplicación; su configuración actual no comprueba por sí sola la conexión con PostgreSQL.
 
-La base de datos no se crea al ejecutar la aplicación. Cada integrante debe crear su base local y aplicar el SQL antes de utilizar funciones de persistencia. Las conexiones y claves JWT se configuran localmente mediante User Secrets o variables de entorno y no se suben a Git.
+## Scaffolding
 
-## Cómo trabajaremos con las ramas
+Los modelos ya están en el repositorio: no es necesario regenerarlos al clonar si la base utiliza el esquema acordado.
 
-**`main` contiene la base común y las contribuciones ya integradas.** Cada integrante crea una rama para su grupo de entidades, sube sus commits y abre un Pull Request hacia `main`.
+El script `HelpDeskApi/scripts/Actualizar-Modelo.ps1` lee PostgreSQL y regenera modelos y contexto. Se utiliza únicamente ante cambios coordinados del esquema. No crea tablas ni crea al administrador. Conservar `HelpDeskDbContext.Custom.cs`, que contiene las correcciones de relaciones y concurrencia.
 
-Ejemplo para un integrante:
+## Trabajo por ramas y commits
+
+`main` contiene lo compartido. Para desarrollar, actualizar primero la copia local y crear una rama propia:
 
 ```powershell
 git switch main
 git pull --ff-only origin main
-git switch -c feature/gianfranco-cambios
+git switch -c feature/nombre-avance
 ```
 
-Después de implementar y verificar su parte:
+Si ya existe la rama personal, usar `git switch feature/nombre-avance` en vez de crearla otra vez. Guardar o confirmar el trabajo local antes de cambiar de rama.
+
+Realizar commits por entidad o por un cambio compartido concreto. Incluir los DTOs que necesitan los handlers para compilar. Ejemplo de un avance de Cambios:
 
 ```powershell
-# Revisar qué cambió.
 git status
-
-# Seleccionar archivos de su grupo; sustituir esta ruta por la que corresponda.
 git add .\HelpDeskApi\HelpDesk.Application\UseCases\Cambios\
-
-git commit -m "feat: agregar casos de uso de cambios"
-git push -u origin feature/gianfranco-cambios
+git add .\HelpDeskApi\HelpDesk.Domain\Dtos\Cambios\
+git add .\HelpDeskApi\HelpDeskApi\Controllers\CambiosController.cs
+git commit -m "Agregar casos de uso, DTO y controlador de Cambios"
+git push -u origin feature/nombre-avance
 ```
 
-Agregar también los DTOs, controladores y demás archivos de su grupo que correspondan. El ejemplo de carpeta `UseCases/Cambios` se utilizará cuando el responsable la cree; no forma parte de la base inicial.
+Abrir un Pull Request con **base `main`** y la rama personal como origen. Revisar los archivos, resolver conflictos y comprobar la compilación antes de fusionar. Si ya existe un PR abierto de esa rama, los nuevos commits aparecen en el mismo PR.
 
-En GitHub, abrir **Pull requests → New pull request**, seleccionando `main` como destino y su rama como origen. Un compañero revisa el contenido y la compilación antes de integrar. Usar la cuenta y autoría propia para que los commits permitan identificar el aporte de cada integrante.
+Cada integrante utiliza su propia cuenta de GitHub y necesita acceso como colaborador para subir ramas al repositorio del equipo.
 
-| Integrante | Rama sugerida | Grupo funcional |
-|---|---|---|
-| Diego Medina | `feature/diego-seguridad` | Usuarios, roles, permisos y autenticación |
-| Gianfranco Paolo | `feature/gianfranco-cambios` | Cambios, tareas y aprobaciones |
-| Fernando Aquima | `feature/fernando-activos` | Activos y asignaciones |
-| Leticia Maldonado | `feature/leticia-conocimiento` | Conocimiento y problemas recurrentes |
-| Frank Oviedo | `feature/frank-comunicacion` | Comentarios, adjuntos y notificaciones |
-| Stiven Yerai | `feature/stiven-organizacion` | Sedes, áreas y equipos de soporte |
-| Ederson Vilca | `feature/ederson-servicios` | Servicios, políticas y encuestas |
-| Brahan Quispe | `feature/brahan-tickets` | Tickets, reportes, auditoría e integración |
+## Coordinación e integración
 
-Los propietarios del repositorio deben invitar a los compañeros como colaboradores para que puedan subir ramas. Este commit no configura invitaciones ni reglas de protección de `main`.
+- Coordinar cambios del contexto, modelos, solución, paquetes y contratos compartidos con Brahan.
+- Coordinar autenticación con Diego y su integración de arranque con Brahan.
+- No reemplazar `Program.cs` desde cada módulo ni incorporar usuarios simulados con todos los permisos a la configuración compartida.
+- Revisar las diferencias de ambas ramas al resolver conflictos; no aceptar todos los cambios sin revisar el archivo.
+- Excluir `bin`, `obj`, `.idea`, credenciales y configuración privada de los commits.
+- Comprobar manualmente los endpoints del módulo con datos y permisos apropiados después de compilar.
 
-## Coordinación de archivos compartidos
-
-- Coordinar con Brahan los cambios al `.sln`, los `.csproj`, el contexto y el scaffolding.
-- No regenerar todos los modelos por una modificación de un handler.
-- Coordinar la seguridad compartida con Diego.
-- No subir `bin`, `obj`, `.idea`, credenciales, tokens ni configuración privada.
-- Mantener los cambios de esquema en scripts SQL versionados.
-
-El repositorio de referencia y este repositorio de trabajo tienen propósitos distintos. Cada contribución debe indicar qué se incorporó, qué se adaptó y cómo se verificó.
-
-## Pruebas
-
-```powershell
-dotnet test .\HelpDeskApi\HelpDesk.Tests\HelpDesk.Tests.csproj
-```
-
-## Health check
-
-`GET /health` devuelve el estado de la API.
+La revisión final debe comprobar el flujo integrado de login, creación de ticket, asignación, atención, resolución y cierre. La compilación por sí sola no verifica toda la lógica contra la base.
