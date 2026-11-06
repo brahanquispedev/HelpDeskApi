@@ -1,8 +1,8 @@
-namespace HelpDesk.Domain.Dtos.CategoriasConocimiento;
+namespace HelpDesk.Domain.Dtos.CategoriasServicios;
 
-public class CategoriasConocimientoResponseDto
+public class CategoriasServiciosResponseDto
 {
-    public Guid IdCategoriaConocimiento
+    public Guid IdCategoriaServicio
     { get; set; }
     public string Nombre
     { get; set; } = string.Empty;
