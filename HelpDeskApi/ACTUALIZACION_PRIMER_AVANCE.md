@@ -28,7 +28,7 @@ Los contratos de seguridad de Domain están en archivos separados. JwtService y 
 
 ## Estado de la API
 
-Este avance todavía no incorpora controladores de negocio ni integra los servicios de HelpDesk en Program.cs; el arranque conserva WeatherForecast. Compilar correctamente verifica los componentes, pero no permite probar todavía el flujo completo por HTTP. Autenticación y los módulos de los demás integrantes se incorporan en sus respectivos avances.
+Los controladores de Tickets y AsignacionesTickets ya estan integrados en Program.cs mediante AddApplicationServices/AddInfrastructureServices/AddApiServices. El flujo HTTP esta disponible con autenticacion JWT. Las esperas, reanudaciones, reaperturas, cancelaciones y reasignaciones quedan para la siguiente entrega. Se agrego health check en /health y proyecto de pruebas xUnit.
 
 ## Compilar
 
