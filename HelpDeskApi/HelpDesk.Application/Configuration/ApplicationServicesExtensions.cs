@@ -1,4 +1,3 @@
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,13 +7,8 @@ public static class ApplicationServicesExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        services.AddScoped<ServiceFactory>(p => type => p.GetRequiredService(type));
-        services.AddScoped<IMediator, Mediator>();
-        foreach (var type in typeof(ApplicationServicesExtensions).Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract))
-            foreach (var contract in type.GetInterfaces().Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)))
-                services.AddTransient(contract, type);
+        services.AddMediatR(typeof(ApplicationServicesExtensions).Assembly);
         services.AddScoped<AccessRules>();
-        // Registrar AuthService cuando se incorpore el modulo de Autenticacion.
         return services;
     }
 }

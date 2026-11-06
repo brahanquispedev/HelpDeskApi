@@ -94,3 +94,13 @@ Los propietarios del repositorio deben invitar a los compañeros como colaborado
 - Mantener los cambios de esquema en scripts SQL versionados.
 
 El repositorio de referencia y este repositorio de trabajo tienen propósitos distintos. Cada contribución debe indicar qué se incorporó, qué se adaptó y cómo se verificó.
+
+## Pruebas
+
+```powershell
+dotnet test .\HelpDeskApi\HelpDesk.Tests\HelpDesk.Tests.csproj
+```
+
+## Health check
+
+`GET /health` devuelve el estado de la API.
