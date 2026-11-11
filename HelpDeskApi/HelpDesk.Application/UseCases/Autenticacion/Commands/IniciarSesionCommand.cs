@@ -47,7 +47,7 @@ internal sealed class IniciarSesionCommandHandler(
                 .Select(x => x.IdRol)
                 .ToListAsync(ct);
 
-            var roles = await _unitOfWork.Repository<Roles>().Query()
+            var roles = await _unitOfWork.Repository<Domain.Models.Roles>().Query()
                 .Where(r => roleIds.Contains(r.IdRol))
                 .Select(r => r.Nombre)
                 .ToListAsync(ct);
