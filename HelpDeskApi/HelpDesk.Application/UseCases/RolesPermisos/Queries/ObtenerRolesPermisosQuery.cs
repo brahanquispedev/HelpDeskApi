@@ -1,0 +1,41 @@
+using HelpDesk.Application.Security;
+using HelpDesk.Domain.Dtos.Common;
+using HelpDesk.Domain.Dtos.RolesPermisos;
+using HelpDesk.Domain.Exceptions;
+using HelpDesk.Domain.Ports;
+using MediatR;
+
+namespace HelpDesk.Application.UseCases.RolesPermisos.Queries;
+
+public class ObtenerRolesPermisosQuery : IRequest<ResponseDto<RolesPermisosResponseDto>>
+{
+    public Guid IdRol { get; set; }
+    public Guid IdPermiso { get; set; }
+}
+
+internal sealed class ObtenerRolesPermisosQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ObtenerRolesPermisosQuery, ResponseDto<RolesPermisosResponseDto>>
+{
+    public async Task<ResponseDto<RolesPermisosResponseDto>> Handle(ObtenerRolesPermisosQuery request, CancellationToken ct)
+    {
+        try
+        {
+            var entity = await _unitOfWork.Repository<Dictionary<string, object>>("RolesPermisos").GetByIdAsync(request.IdRol, request.IdPermiso)
+                         ?? throw new BusinessException(404, "Registro no encontrado.");
+            access.EnsureRead(entity);
+            return new ResponseDto<RolesPermisosResponseDto>(200, new RolesPermisosResponseDto()
+            {
+                IdRol = (Guid)entity["IdRol"],
+                IdPermiso = (Guid)entity["IdPermiso"]
+            });
+        }
+        catch (BusinessException ex)
+        {
+            return new ResponseDto<RolesPermisosResponseDto>(ex.Status, default, ex.Message);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return new ResponseDto<RolesPermisosResponseDto>(500, default, "No se pudo completar la operacion.");
+        }
+    }
+
+}
