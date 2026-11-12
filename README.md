@@ -17,7 +17,7 @@ El backend utiliza **.NET 10, PostgreSQL, Entity Framework Core, MediatR y auten
 
 Cada responsable incorpora los **DTOs, casos de uso y controladores** de sus entidades en commits identificables. Los modelos generados, repositorios, UnitOfWork y servicios técnicos son componentes compartidos que se coordinan con Brahan.
 
-`Infrastructure/Services` contiene servicios técnicos, como JWT y hash, a cargo de Brahan. El módulo de negocio `Servicios`, que representa el catálogo de atenciones, corresponde a Ederson.
+`Application/Services` contiene los servicios de JWT y hash, a cargo de Brahan, y `AuthService`, a cargo de Diego. El módulo de negocio `Servicios`, que representa el catálogo de atenciones, corresponde a Ederson.
 
 La distribución exhaustiva de la primera versión está en la [guía de la plantilla](https://github.com/BrahanPRANK/HelpDeskApi/blob/main/HelpDeskBackend/DISTRIBUCION_EQUIPO.md). Esa guía distingue los archivos de la plantilla y los nombres de los proyectos del equipo; su inventario de avance corresponde a la fecha de revisión indicada allí.
 

@@ -1,7 +1,7 @@
 using HelpDesk.Domain.Ports;
 using Microsoft.AspNetCore.Identity;
 
-namespace HelpDesk.Infrastructure.Services;
+namespace HelpDesk.Application.Services;
 
 public class PasswordService : IPasswordService
 {

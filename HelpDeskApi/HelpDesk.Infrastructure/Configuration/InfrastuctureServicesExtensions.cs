@@ -4,7 +4,6 @@ using System.Text;
 using HelpDesk.Domain.Ports;
 using HelpDesk.Infrastructure.Data;
 using HelpDesk.Infrastructure.Repositories;
-using HelpDesk.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -23,8 +22,6 @@ public static class InfrastructureServicesExtensions
         if (string.IsNullOrWhiteSpace(config["Jwt:Issuer"]) || string.IsNullOrWhiteSpace(config["Jwt:Audience"])) throw new InvalidOperationException("Configure Jwt:Issuer y Jwt:Audience.");
         services.AddDbContext<HelpDeskDbContext>(o => o.UseNpgsql(connection));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IPasswordService, PasswordService>();
-        services.AddScoped<ITokenService, JwtService>();
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
         {
             options.MapInboundClaims = false;

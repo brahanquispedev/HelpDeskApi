@@ -5,7 +5,7 @@ using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Ports;
 
-namespace HelpDesk.Application.Security;
+namespace HelpDesk.Application.Services;
 
 public sealed class AuthService(IUnitOfWork _unitOfWork, IPasswordService passwords)
 {
