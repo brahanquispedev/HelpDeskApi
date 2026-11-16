@@ -6,7 +6,7 @@ using Npgsql;
 
 namespace HelpDesk.Infrastructure.Repositories;
 
-public class UnitOfWork : IUnitOfWork
+public class  UnitOfWork : IUnitOfWork
 {
     private readonly HelpDeskDbContext _context;
     private readonly Dictionary<(Type, string?), object> _repositories = new();
