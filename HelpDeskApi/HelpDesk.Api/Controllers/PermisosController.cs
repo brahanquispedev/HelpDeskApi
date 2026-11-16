@@ -1,0 +1,35 @@
+using HelpDesk.Application.UseCases.Permisos;
+using HelpDesk.Domain.Dtos.Permisos;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+namespace HelpDesk.Api.Controllers;
+
+[ApiController, Route("api/Permisos"), Authorize]
+public sealed class PermisosController(IMediator mediator) : ControllerBase
+{
+    [HttpGet]
+    public async Task<IActionResult> List([FromQuery] ListarPermisosQuery query)
+    {
+        var result = await mediator.Send(query);
+        return StatusCode(result.StatusCode, result);
+    }
+    [HttpGet("{idPermiso:guid}")]
+    public async Task<IActionResult> Get(Guid idPermiso)
+    { var result = await mediator.Send(new ObtenerPermisosQuery { IdPermiso = idPermiso }); return StatusCode(result.StatusCode, result); }
+    [HttpPost]
+    public async Task<IActionResult> Crear([FromBody] CrearPermisosCommand datos)
+    {
+        var result = await mediator.Send(datos); return StatusCode(result.StatusCode, result);
+    }
+    [HttpPut("{idPermiso:guid}")]
+    public async Task<IActionResult> Actualizar(Guid idPermiso, [FromBody] ActualizarPermisosCommand datos)
+    {
+        datos.Keys = [idPermiso];
+        var result = await mediator.Send(datos); return StatusCode(result.StatusCode, result);
+    }
+    [HttpDelete("{idPermiso:guid}")]
+    public async Task<IActionResult> Eliminar(Guid idPermiso)
+    { var result = await mediator.Send(new EliminarPermisosCommand { Keys = [idPermiso] }); return StatusCode(result.StatusCode, result); }
+
+}
