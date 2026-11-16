@@ -23,11 +23,11 @@ internal sealed class RegistrarUsuarioCommandHandler(IUnitOfWork _unitOfWork, IP
             var nombreUsuario = request.NombreUsuario.Trim();
             var correo = request.Correo.Trim().ToLowerInvariant();
 
-            var existe = await _unitOfWork.Repository<Usuarios>().Query()
+            var existe = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().Query()
                 .AnyAsync(u => u.NombreUsuario == nombreUsuario || u.Correo == correo, ct);
             Validation.Require(!existe, "El nombre de usuario o el correo ya estan registrados.", 409);
 
-            var usuario = new Usuarios
+            var usuario = new Domain.Models.Usuarios
             {
                 IdUsuario = Guid.NewGuid(),
                 Nombres = request.Nombres.Trim(),
@@ -39,7 +39,7 @@ internal sealed class RegistrarUsuarioCommandHandler(IUnitOfWork _unitOfWork, IP
                 FechaRegistro = DateTime.UtcNow
             };
 
-            await _unitOfWork.Repository<Usuarios>().AddAsync(usuario);
+            await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().AddAsync(usuario);
             await _unitOfWork.Complete();
 
             return new ResponseDto<UsuarioRegistradoDto>(
