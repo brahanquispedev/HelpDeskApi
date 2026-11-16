@@ -35,14 +35,14 @@ internal sealed class IniciarSesionCommandHandler(
             var nombreUsuario = request.NombreUsuario.Trim();
             var correo = nombreUsuario.ToLowerInvariant();
 
-            var usuario = await _unitOfWork.Repository<Usuarios>().Query()
-                .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario || u.Correo == correo, ct);
+            var usuario = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().Query()
+                .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario || u.Correo.ToLower() == correo, ct);
 
             Validation.Require(usuario is not null, "Usuario o clave incorrectos.", 401);
             Validation.Require(usuario!.Activo, "Usuario inactivo.", 403);
             Validation.Require(_passwordService.Verify(usuario.ClaveHash, request.Clave), "Usuario o clave incorrectos.", 401);
 
-            var roleIds = await _unitOfWork.Repository<UsuariosRoles>().Query()
+            var roleIds = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.UsuariosRoles>().Query()
                 .Where(x => x.IdUsuario == usuario.IdUsuario)
                 .Select(x => x.IdRol)
                 .ToListAsync(ct);
