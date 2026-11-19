@@ -1,0 +1,35 @@
+using HelpDesk.Application.UseCases.TiposActivos;
+using HelpDesk.Domain.Dtos.TiposActivos;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+namespace HelpDesk.Api.Controllers;
+
+[ApiController, Route("api/TiposActivos"), Authorize]
+public sealed class TiposActivosController(IMediator mediator) : ControllerBase
+{
+    [HttpGet]
+    public async Task<IActionResult> List([FromQuery] ListarTiposActivosQuery query)
+    {
+        var result = await mediator.Send(query);
+        return StatusCode(result.StatusCode, result);
+    }
+    [HttpGet("{idTipoActivo:guid}")]
+    public async Task<IActionResult> Get(Guid idTipoActivo)
+    { var result = await mediator.Send(new ObtenerTiposActivosQuery { IdTipoActivo = idTipoActivo }); return StatusCode(result.StatusCode, result); }
+    [HttpPost]
+    public async Task<IActionResult> Crear([FromBody] CrearTiposActivosCommand datos)
+    {
+        var result = await mediator.Send(datos); return StatusCode(result.StatusCode, result);
+    }
+    [HttpPut("{idTipoActivo:guid}")]
+    public async Task<IActionResult> Actualizar(Guid idTipoActivo, [FromBody] ActualizarTiposActivosCommand datos)
+    {
+        datos.Keys = [idTipoActivo];
+        var result = await mediator.Send(datos); return StatusCode(result.StatusCode, result);
+    }
+    [HttpDelete("{idTipoActivo:guid}")]
+    public async Task<IActionResult> Eliminar(Guid idTipoActivo)
+    { var result = await mediator.Send(new EliminarTiposActivosCommand { Keys = [idTipoActivo] }); return StatusCode(result.StatusCode, result); }
+
+}
