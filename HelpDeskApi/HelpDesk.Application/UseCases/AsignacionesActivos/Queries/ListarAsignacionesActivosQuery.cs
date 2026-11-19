@@ -1,51 +1,53 @@
-using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
+using Microsoft.EntityFrameworkCore;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
+using HelpDesk.Domain.Dtos.AsignacionesActivos;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.AsignacionesActivos.Commands;
+namespace HelpDesk.Application.UseCases.AsignacionesActivos;
 
-public class DevolverActivoCommand : IRequest<ResponseDto<AccionResultadoDto>>
+public class ListarAsignacionesActivosQuery : IRequest<ResponseDto<PaginaDto<AsignacionesActivosResponseDto>>>
 {
-    [JsonIgnore]
-    public Guid Id { get; set; }
-
-    [StringLength(4000)]
-    public string Motivo { get; set; } = string.Empty;
+    public int Pagina { get; set; } = 1;
+    public int Tamano { get; set; } = 20;
 }
 
-internal sealed class DevolverActivoCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
-    : IRequestHandler<DevolverActivoCommand, ResponseDto<AccionResultadoDto>>
+internal sealed class ListarAsignacionesActivosQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarAsignacionesActivosQuery, ResponseDto<PaginaDto<AsignacionesActivosResponseDto>>>
 {
-    public async Task<ResponseDto<AccionResultadoDto>> Handle(DevolverActivoCommand r, CancellationToken ct)
+    public async Task<ResponseDto<PaginaDto<AsignacionesActivosResponseDto>>> Handle(ListarAsignacionesActivosQuery request, CancellationToken ct)
     {
         try
         {
-            Validation.Check(r);
-            var result = "completado";
-            access.Permission("activos.administrar");
-            var assignment = await Required<global::HelpDesk.Domain.Models.AsignacionesActivos>(r.Id);
-            Validation.Require(assignment.FechaDevolucion is null, "Ya fue devuelto.", 409);
-            assignment.FechaDevolucion = DateTime.UtcNow;
-            (await Required<global::HelpDesk.Domain.Models.Activos>(assignment.IdActivo)).Estado = "disponible";
-            result = "devuelto";
-            await _unitOfWork.Complete();
-            return new ResponseDto<AccionResultadoDto>(200, new AccionResultadoDto(r.Id, result));
+
+            Validation.Require(request.Pagina >= 1 && request.Pagina <= 1000000 && request.Tamano is >= 1 and <= 100,
+            "Pagina debe ser positiva y tamano debe estar entre 1 y 100.");
+            var query = access.Scope(_unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesActivos>().Query());
+
+            var total = await (query).CountAsync();
+            var items = await (query.OrderBy(x => x.IdAsignacion).Skip((request.Pagina - 1) * request.Tamano).Take(request.Tamano)
+            .Select(entity => new AsignacionesActivosResponseDto
+            {
+                IdAsignacion = entity.IdAsignacion,
+                IdActivo = entity.IdActivo,
+                IdUsuarioResponsable = entity.IdUsuarioResponsable,
+                IdUsuarioAsignador = entity.IdUsuarioAsignador,
+                FechaAsignacion = entity.FechaAsignacion,
+                FechaDevolucion = entity.FechaDevolucion,
+                Observaciones = entity.Observaciones
+            })).ToListAsync();
+            return new ResponseDto<PaginaDto<AsignacionesActivosResponseDto>>(200, new PaginaDto<AsignacionesActivosResponseDto>(items, request.Pagina, request.Tamano, total));
         }
         catch (BusinessException ex)
         {
-            return new ResponseDto<AccionResultadoDto>(ex.Status, default, ex.Message);
+            return new ResponseDto<PaginaDto<AsignacionesActivosResponseDto>>(ex.Status, default, ex.Message);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            return new ResponseDto<AccionResultadoDto>(500, default, "No se pudo completar la operacion.");
+            return new ResponseDto<PaginaDto<AsignacionesActivosResponseDto>>(500, default, "No se pudo completar la operacion.");
         }
     }
 
-    private async Task<T> Required<T>(Guid id) where T : class =>
-        await _unitOfWork.Repository<T>().GetByIdAsync([id]) ?? throw new BusinessException(404, "Registro relacionado no encontrado.");
 }
