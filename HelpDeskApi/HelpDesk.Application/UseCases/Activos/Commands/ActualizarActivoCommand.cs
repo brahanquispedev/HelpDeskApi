@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using HelpDesk.Application.Common;
-using HelpDesk.Application.Security;
+using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Activos;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Exceptions;

@@ -1,4 +1,4 @@
-using HelpDesk.Application.Security;
+using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.EnviosNotificaciones;
 using HelpDesk.Domain.Exceptions;

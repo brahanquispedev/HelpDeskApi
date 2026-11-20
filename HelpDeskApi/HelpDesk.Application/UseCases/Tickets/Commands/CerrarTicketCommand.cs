@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Application.Common;
-using HelpDesk.Application.Security;
+using HelpDesk.Application.Services.Security;
 using HelpDesk.Application.Services;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;

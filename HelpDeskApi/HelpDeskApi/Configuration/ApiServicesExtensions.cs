@@ -1,7 +1,5 @@
-using HelpDesk.Api.Security;
 using HelpDesk.Api.Middleware;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Domain.Ports;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,8 +51,6 @@ public static class ApiServicesExtensions
                 }));
         });
         services.AddHealthChecks();
-        services.AddHttpContextAccessor();
-        services.AddScoped<ICurrentUser, CurrentUser>();
         return services;
     }
 

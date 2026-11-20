@@ -1,7 +1,7 @@
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
-namespace HelpDesk.Application.Security;
+namespace HelpDesk.Application.Services.Security;
 
 public sealed class AccessRules(IUnitOfWork _unitOfWork, ICurrentUser actor)
 {

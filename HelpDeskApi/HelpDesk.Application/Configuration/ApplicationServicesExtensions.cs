@@ -1,4 +1,4 @@
-using HelpDesk.Application.Security;
+using HelpDesk.Application.Services.Security;
 using HelpDesk.Application.Services;
 using HelpDesk.Domain.Ports;
 using MediatR;
@@ -10,6 +10,8 @@ public static class ApplicationServicesExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddMediatR(typeof(ApplicationServicesExtensions).Assembly);
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddScoped<AccessRules>();
         services.AddScoped<AuthService>();
         services.AddScoped<TicketNotifications>();

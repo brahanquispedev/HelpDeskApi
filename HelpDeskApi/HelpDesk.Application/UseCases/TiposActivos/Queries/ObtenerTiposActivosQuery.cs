@@ -1,6 +1,6 @@
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Application.Common;
-using HelpDesk.Application.Security;
+using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.TiposActivos;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Application.Common;
-using HelpDesk.Application.Security;
+using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.TareasCambios;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
