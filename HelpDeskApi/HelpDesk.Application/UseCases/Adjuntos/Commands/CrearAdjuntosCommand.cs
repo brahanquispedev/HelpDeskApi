@@ -1,0 +1,85 @@
+using System.ComponentModel.DataAnnotations;
+using HelpDesk.Domain.Dtos.Common;
+using HelpDesk.Application.Common;
+using HelpDesk.Application.Security;
+using HelpDesk.Domain.Dtos.Adjuntos;
+using HelpDesk.Domain.Exceptions;
+using HelpDesk.Domain.Models;
+using HelpDesk.Domain.Ports;
+using MediatR;
+namespace HelpDesk.Application.UseCases.Adjuntos;
+
+public class CrearAdjuntosCommand : IRequest<ResponseDto<AdjuntosResponseDto>>
+{
+    public Guid IdTicket { get; set; }
+    public Guid? IdComentario { get; set; }
+    [Required]
+    [StringLength(10000)]
+    public string NombreArchivo { get; set; } = "";
+    [Required]
+    [StringLength(10000)]
+    public string TipoArchivo { get; set; } = "";
+    public long TamanoBytes { get; set; }
+    public bool EsInterno { get; set; }
+}
+
+internal sealed class CrearAdjuntosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor) : IRequestHandler<CrearAdjuntosCommand, ResponseDto<AdjuntosResponseDto>>
+{
+    public async Task<ResponseDto<AdjuntosResponseDto>> Handle(CrearAdjuntosCommand request, CancellationToken ct)
+    {
+        try
+        {
+
+            Validation.Check(request);
+            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            var entity = new global::HelpDesk.Domain.Models.Adjuntos()
+            {
+                IdAdjunto = Guid.NewGuid(),
+                IdTicket = request.IdTicket,
+                IdComentario = request.IdComentario,
+                NombreArchivo = request.NombreArchivo,
+                TipoArchivo = request.TipoArchivo,
+                TamanoBytes = request.TamanoBytes,
+                EsInterno = request.EsInterno,
+                Fecha = DateTime.UtcNow
+            };
+            var attachedTicket = await Required<global::HelpDesk.Domain.Models.Tickets>(entity.IdTicket);
+            access.EnsureRead(attachedTicket);
+            if (entity.EsInterno) access.Permission("comentarios.internos");
+            entity.IdUsuario = actor.Id;
+            if (entity.IdComentario is Guid commentId)
+            {
+                var parent = await Required<global::HelpDesk.Domain.Models.Comentarios>(commentId);
+                Validation.Require(parent.IdTicket == entity.IdTicket, "El comentario pertenece entity otro ticket.");
+                if (parent.EsInterno) entity.EsInterno = true;
+            }
+
+            await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Adjuntos>().AddAsync(entity);
+            await _unitOfWork.Complete();
+            return new ResponseDto<AdjuntosResponseDto>(201, new AdjuntosResponseDto
+            {
+                IdAdjunto = entity.IdAdjunto,
+                IdTicket = entity.IdTicket,
+                IdComentario = entity.IdComentario,
+                IdUsuario = entity.IdUsuario,
+                NombreArchivo = entity.NombreArchivo,
+                TipoArchivo = entity.TipoArchivo,
+                TamanoBytes = entity.TamanoBytes,
+                EsInterno = entity.EsInterno,
+                Fecha = entity.Fecha
+            }, "Registro creado.");
+        }
+        catch (BusinessException ex)
+        {
+            return new ResponseDto<AdjuntosResponseDto>(ex.Status, default, ex.Message);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return new ResponseDto<AdjuntosResponseDto>(500, default, "No se pudo completar la operacion.");
+        }
+    }
+
+    private async Task<T> Required<T>(Guid id) where T : class =>
+        await _unitOfWork.Repository<T>().GetByIdAsync([id]) ?? throw new BusinessException(404, "Registro relacionado no encontrado.");
+
+}

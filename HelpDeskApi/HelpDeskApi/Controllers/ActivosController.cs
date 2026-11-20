@@ -1,9 +1,8 @@
-using HelpDesk.Application.UseCases.Activos.Commands;
-using HelpDesk.Application.UseCases.Activos.Queries;
+using HelpDesk.Application.UseCases.Activos;
+using HelpDesk.Domain.Dtos.Activos;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 namespace HelpDesk.Api.Controllers;
 
 [ApiController, Route("api/Activos"), Authorize]
@@ -15,34 +14,22 @@ public sealed class ActivosController(IMediator mediator) : ControllerBase
         var result = await mediator.Send(query);
         return StatusCode(result.StatusCode, result);
     }
-
     [HttpGet("{idActivo:guid}")]
     public async Task<IActionResult> Get(Guid idActivo)
-    {
-        var result = await mediator.Send(new ObtenerActivoQuery { IdActivo = idActivo });
-        return StatusCode(result.StatusCode, result);
-    }
-
+    { var result = await mediator.Send(new ObtenerActivosQuery { IdActivo = idActivo }); return StatusCode(result.StatusCode, result); }
     [HttpPost]
-    public async Task<IActionResult> Crear([FromBody] CrearActivoCommand datos)
+    public async Task<IActionResult> Crear([FromBody] CrearActivosCommand datos)
     {
-        var result = await mediator.Send(datos);
-        return StatusCode(result.StatusCode, result);
+        var result = await mediator.Send(datos); return StatusCode(result.StatusCode, result);
     }
-
     [HttpPut("{idActivo:guid}")]
-    public async Task<IActionResult> Actualizar(Guid idActivo, [FromBody] ActualizarActivoCommand datos)
+    public async Task<IActionResult> Actualizar(Guid idActivo, [FromBody] ActualizarActivosCommand datos)
     {
-        datos.IdActivo = idActivo;
-        var result = await mediator.Send(datos);
-        return StatusCode(result.StatusCode, result);
+        datos.Keys = [idActivo];
+        var result = await mediator.Send(datos); return StatusCode(result.StatusCode, result);
     }
+    [HttpDelete("{idActivo:guid}")]
+    public async Task<IActionResult> Eliminar(Guid idActivo)
+    { var result = await mediator.Send(new EliminarActivosCommand { Keys = [idActivo] }); return StatusCode(result.StatusCode, result); }
 
-    [HttpPost("{idActivo:guid}/estado")]
-    public async Task<IActionResult> CambiarEstado(Guid idActivo, [FromBody] CambiarEstadoActivoCommand datos)
-    {
-        datos.IdActivo = idActivo;
-        var result = await mediator.Send(datos);
-        return StatusCode(result.StatusCode, result);
-    }
 }
