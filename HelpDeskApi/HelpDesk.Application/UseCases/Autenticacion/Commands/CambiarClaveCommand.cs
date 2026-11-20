@@ -33,7 +33,7 @@ internal sealed class CambiarClaveCommandHandler(
             if (!_actor.IsAuthenticated)
                 throw new BusinessException(401, "Inicie sesion.");
 
-            var usuario = await _unitOfWork.Repository<Usuarios>().Query()
+            var usuario = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().Query()
                 .FirstOrDefaultAsync(u => u.IdUsuario == _actor.Id, ct);
 
             Validation.Require(usuario is not null, "Usuario no encontrado.", 404);
@@ -41,7 +41,7 @@ internal sealed class CambiarClaveCommandHandler(
             Validation.Require(request.ClaveActual != request.ClaveNueva, "La nueva clave debe ser diferente a la actual.", 400);
 
             usuario.ClaveHash = _passwordService.Hash(request.ClaveNueva);
-            _unitOfWork.Repository<Usuarios>().Update(usuario);
+            _unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().Update(usuario);
             await _unitOfWork.Complete();
 
             return new ResponseDto<OperacionDto>(200, new OperacionDto(true));
