@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Aprobaciones;
 using HelpDesk.Domain.Exceptions;
@@ -32,12 +31,22 @@ internal sealed class ActualizarAprobacionesCommandHandler(IUnitOfWork _unitOfWo
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdAprobador == Guid.Empty)
+            {
+                throw new ValidationException("IdAprobador debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Aprobaciones>().GetByIdAsync(request.Keys)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
-            Validation.Require(entity.Estado == "pendiente", "Una aprobacion decidida no se modifica.", 409);
+            if (!(entity.Estado == "pendiente"))
+            {
+                throw new BusinessException(409, "Una aprobacion decidida no se modifica.");
+            }
             entity.IdTicket = request.IdTicket;
             entity.IdCambio = request.IdCambio;
             entity.IdAprobador = request.IdAprobador;
@@ -45,10 +54,16 @@ internal sealed class ActualizarAprobacionesCommandHandler(IUnitOfWork _unitOfWo
             entity.Motivo = request.Motivo;
             entity.ComentarioDecision = request.ComentarioDecision;
 
-            Validation.Require(entity.IdAprobador != entity.IdSolicitante, "No se permite autoaprobacion.");
+            if (!(entity.IdAprobador != entity.IdSolicitante))
+            {
+                throw new BusinessException(400, "No se permite autoaprobacion.");
+            }
             var approver = await Required<global::HelpDesk.Domain.Models.Usuarios>(entity.IdAprobador);
             var approverRoles = _unitOfWork.Repository<global::HelpDesk.Domain.Models.UsuariosRoles>().Query().Where(x => x.IdUsuario == approver.IdUsuario).Select(x => x.IdRol);
-            Validation.Require(approver.Activo && _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().Query().Any(x => approverRoles.Contains(x.IdRol) && x.Nombre == "aprobador"), "El usuario debe tener rol aprobador y estar activo.");
+            if (!(approver.Activo && _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().Query().Any(x => approverRoles.Contains(x.IdRol) && x.Nombre == "aprobador")))
+            {
+                throw new BusinessException(400, "El usuario debe tener rol aprobador y estar activo.");
+            }
             if (entity.IdTicket is Guid approvalTicket) access.EnsureRead(await Required<global::HelpDesk.Domain.Models.Tickets>(approvalTicket));
             if (entity.IdCambio is Guid approvalChange) access.EnsureRead(await Required<global::HelpDesk.Domain.Models.Cambios>(approvalChange));
             await _unitOfWork.Complete();
@@ -66,6 +81,10 @@ internal sealed class ActualizarAprobacionesCommandHandler(IUnitOfWork _unitOfWo
                 FechaSolicitud = entity.FechaSolicitud,
                 FechaDecision = entity.FechaDecision
             }, "Registro actualizado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<AprobacionesResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
 using Microsoft.EntityFrameworkCore;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Application.Services;
 using HelpDesk.Domain.Exceptions;
@@ -32,14 +31,24 @@ internal sealed class IniciarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurr
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdTicket == Guid.Empty)
+            {
+                throw new ValidationException("IdTicket debe ser un identificador valido.");
+            }
             var t = await Required<global::HelpDesk.Domain.Models.Tickets>(request.IdTicket);
             access.EnsureRead(t);
-            Validation.Require(t.Version == request.Version, "El ticket cambio; consulte su version actual.", 409);
+            if (!(t.Version == request.Version))
+            {
+                throw new BusinessException(409, "El ticket cambio; consulte su version actual.");
+            }
             var before = t.Estado;
             var now = DateTime.UtcNow;
             access.EnsureWork(t);
-            Validation.Require(t.Estado == "asignado", "Debe estar asignado.", 409);
+            if (!(t.Estado == "asignado"))
+            {
+                throw new BusinessException(409, "Debe estar asignado.");
+            }
             t.Estado = "en_atencion";
             t.FechaPrimeraRespuesta ??= now;
             await History(t, "iniciar", before, t.Estado, request.Motivo);
@@ -78,6 +87,10 @@ internal sealed class IniciarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurr
                 FechaCancelacion = t.FechaCancelacion,
                 Version = t.Version
             }, "Accion completada.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<TicketsResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

@@ -1,5 +1,4 @@
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.TicketsArticulos;
 using HelpDesk.Domain.Exceptions;

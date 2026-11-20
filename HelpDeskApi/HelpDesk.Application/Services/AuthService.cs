@@ -1,6 +1,6 @@
+using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Autenticacion;
 using Microsoft.EntityFrameworkCore;
-using HelpDesk.Application.Common;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Ports;
@@ -11,11 +11,14 @@ public sealed class AuthService(IUnitOfWork _unitOfWork, IPasswordService passwo
 {
     public async Task Bootstrap(RegistroDto input)
     {
-        Validation.Check(input);
+        Validator.ValidateObject(input, new ValidationContext(input), validateAllProperties: true);
         // Restriccion de una sola inicializacion. Se ejecuta por consola, nunca por HTTP.
         var adminRole = (await (_unitOfWork.Repository<Roles>().Query().Where(x => x.Nombre == "administrador")).ToListAsync()).SingleOrDefault()
                         ?? throw new BusinessException(409, "Falta el rol administrador.");
-        Validation.Require(await (_unitOfWork.Repository<UsuariosRoles>().Query().Where(x => x.IdRol == adminRole.IdRol)).CountAsync() == 0, "Ya existe un administrador; use la API para altas posteriores.", 409);
+        if (!(await(_unitOfWork.Repository<UsuariosRoles>().Query().Where(x => x.IdRol == adminRole.IdRol)).CountAsync() == 0))
+        {
+            throw new BusinessException(409, "Ya existe un administrador; use la API para altas posteriores.");
+        }
         var user = MakeUser(input);
         await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().AddAsync(user);
         await _unitOfWork.Repository<UsuariosRoles>().AddAsync(new UsuariosRoles

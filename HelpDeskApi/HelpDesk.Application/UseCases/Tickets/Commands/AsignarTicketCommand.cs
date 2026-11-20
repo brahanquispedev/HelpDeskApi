@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
 using Microsoft.EntityFrameworkCore;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Application.Services;
 using HelpDesk.Domain.Exceptions;
@@ -32,26 +31,51 @@ internal sealed class AsignarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurr
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdTicket == Guid.Empty)
+            {
+                throw new ValidationException("IdTicket debe ser un identificador valido.");
+            }
             var t = await Required<global::HelpDesk.Domain.Models.Tickets>(request.IdTicket);
             access.EnsureRead(t);
-            Validation.Require(t.Version == request.Version, "El ticket cambio; consulte su version actual.", 409);
+            if (!(t.Version == request.Version))
+            {
+                throw new BusinessException(409, "El ticket cambio; consulte su version actual.");
+            }
             var before = t.Estado;
             var now = DateTime.UtcNow;
             access.Permission("asignaciones.administrar");
-            Validation.Require(t.Estado == "nuevo", "Solo se asigna un ticket nuevo en esta primera version.", 409);
+            if (!(t.Estado == "nuevo"))
+            {
+                throw new BusinessException(409, "Solo se asigna un ticket nuevo en esta primera version.");
+            }
             var team = request.IdEquipo ?? t.IdEquipoAsignado;
             var tech = request.IdTecnico ?? throw new BusinessException(400, "Indique idTecnico.");
             if (!access.Admin)
-                Validation.Require(_unitOfWork.Repository<global::HelpDesk.Domain.Models.IntegrantesEquipo>().Query().Any(m => m.IdEquipo == team && m.IdUsuario == actor.Id && m.Activo && m.EsCoordinador), "No coordina el equipo destino.", 403);
-            Validation.Require(_unitOfWork.Repository<global::HelpDesk.Domain.Models.EquiposSoporte>().Query().Any(e => e.IdEquipo == team && e.Activo), "Equipo inactivo.");
-            Validation.Require(_unitOfWork.Repository<global::HelpDesk.Domain.Models.IntegrantesEquipo>().Query().Any(m => m.IdEquipo == team && m.IdUsuario == tech && m.Activo && m.Disponible), "Tecnico no disponible en el equipo.");
-            Validation.Require((await Required<global::HelpDesk.Domain.Models.Usuarios>(tech)).Activo, "Tecnico inactivo.");
+                {
+                    if (!(_unitOfWork.Repository<global::HelpDesk.Domain.Models.IntegrantesEquipo>().Query().Any(m => m.IdEquipo == team && m.IdUsuario == actor.Id && m.Activo && m.EsCoordinador)))
+                    {
+                        throw new BusinessException(403, "No coordina el equipo destino.");
+                    }
+                }
+            if (!(_unitOfWork.Repository<global::HelpDesk.Domain.Models.EquiposSoporte>().Query().Any(e => e.IdEquipo == team && e.Activo)))
+            {
+                throw new BusinessException(400, "Equipo inactivo.");
+            }
+            if (!(_unitOfWork.Repository<global::HelpDesk.Domain.Models.IntegrantesEquipo>().Query().Any(m => m.IdEquipo == team && m.IdUsuario == tech && m.Activo && m.Disponible)))
+            {
+                throw new BusinessException(400, "Tecnico no disponible en el equipo.");
+            }
+            if (!((await Required<global::HelpDesk.Domain.Models.Usuarios>(tech)).Activo))
+            {
+                throw new BusinessException(400, "Tecnico inactivo.");
+            }
             var rolesTecnico = _unitOfWork.Repository<global::HelpDesk.Domain.Models.UsuariosRoles>().Query()
                 .Where(relacion => relacion.IdUsuario == tech).Select(relacion => relacion.IdRol);
-            Validation.Require(await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().Query()
-                .AnyAsync(rol => rolesTecnico.Contains(rol.IdRol) && rol.IdPermiso.Any(permiso => permiso.Codigo == "tickets.atender"), ct),
-                "El integrante no tiene permiso para atender tickets.", 409);
+            if (!(await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().Query().AnyAsync(rol => rolesTecnico.Contains(rol.IdRol) && rol.IdPermiso.Any(permiso => permiso.Codigo == "tickets.atender"), ct)))
+            {
+                throw new BusinessException(409, "El integrante no tiene permiso para atender tickets.");
+            }
             var asignacion = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesTickets>()
             .Query().SingleOrDefaultAsync(x => x.IdTicket == t.IdTicket && x.FechaFin == null);
             if (asignacion is null)
@@ -112,6 +136,10 @@ internal sealed class AsignarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurr
                 FechaCancelacion = t.FechaCancelacion,
                 Version = t.Version
             }, "Accion completada.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<TicketsResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

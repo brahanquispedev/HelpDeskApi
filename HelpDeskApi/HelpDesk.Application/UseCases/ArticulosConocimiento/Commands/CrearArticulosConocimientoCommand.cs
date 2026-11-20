@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.ArticulosConocimiento;
 using HelpDesk.Domain.Exceptions;
@@ -28,8 +27,15 @@ internal sealed class CrearArticulosConocimientoCommandHandler(IUnitOfWork _unit
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdCategoriaConocimiento == Guid.Empty)
+            {
+                throw new ValidationException("IdCategoriaConocimiento debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new global::HelpDesk.Domain.Models.ArticulosConocimiento()
             {
                 IdArticulo = Guid.NewGuid(),
@@ -56,6 +62,10 @@ internal sealed class CrearArticulosConocimientoCommandHandler(IUnitOfWork _unit
                 FechaCreacion = entity.FechaCreacion,
                 FechaPublicacion = entity.FechaPublicacion
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<ArticulosConocimientoResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Application.Services;
 using HelpDesk.Domain.Dtos.Comentarios;
@@ -26,7 +25,11 @@ internal sealed class CrearComentariosCommandHandler(IUnitOfWork _unitOfWork, Ac
         try
         {
 
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdTicket == Guid.Empty)
+            {
+                throw new ValidationException("IdTicket debe ser un identificador valido.");
+            }
             if (!access.Admin) access.Permission("comentarios.responder");
             var entity = new global::HelpDesk.Domain.Models.Comentarios()
             {
@@ -39,7 +42,10 @@ internal sealed class CrearComentariosCommandHandler(IUnitOfWork _unitOfWork, Ac
             var ticket = await Required<global::HelpDesk.Domain.Models.Tickets>(entity.IdTicket);
             access.EnsureRead(ticket);
             if (entity.EsInterno) access.Permission("comentarios.internos");
-            Validation.Require(ticket.Estado is not ("cerrado" or "cancelado"), "No se agregan mensajes a un ticket finalizado.", 409);
+            if (!(ticket.Estado is not ("cerrado" or "cancelado")))
+            {
+                throw new BusinessException(409, "No se agregan mensajes a un ticket finalizado.");
+            }
 
             entity.IdAutor = actor.Id;
             if (!entity.EsInterno && actor.HasPermission("tickets.atender") && ticket.IdSolicitante != actor.Id)
@@ -61,6 +67,10 @@ internal sealed class CrearComentariosCommandHandler(IUnitOfWork _unitOfWork, Ac
                 EsInterno = entity.EsInterno,
                 Fecha = entity.Fecha
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<ComentariosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

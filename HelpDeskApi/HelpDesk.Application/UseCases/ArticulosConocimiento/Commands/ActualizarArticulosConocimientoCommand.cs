@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.ArticulosConocimiento;
 using HelpDesk.Domain.Exceptions;
@@ -32,12 +31,22 @@ internal sealed class ActualizarArticulosConocimientoCommandHandler(IUnitOfWork 
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdCategoriaConocimiento == Guid.Empty)
+            {
+                throw new ValidationException("IdCategoriaConocimiento debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.ArticulosConocimiento>().GetByIdAsync(request.Keys)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
-            Validation.Require(entity.Estado != "publicado", "Despublique o archive antes de editar un articulo publicado.", 409);
+            if (!(entity.Estado != "publicado"))
+            {
+                throw new BusinessException(409, "Despublique o archive antes de editar un articulo publicado.");
+            }
             entity.IdCategoriaConocimiento = request.IdCategoriaConocimiento;
             entity.Titulo = request.Titulo;
             entity.Contenido = request.Contenido;
@@ -57,6 +66,10 @@ internal sealed class ActualizarArticulosConocimientoCommandHandler(IUnitOfWork 
                 FechaCreacion = entity.FechaCreacion,
                 FechaPublicacion = entity.FechaPublicacion
             }, "Registro actualizado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<ArticulosConocimientoResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

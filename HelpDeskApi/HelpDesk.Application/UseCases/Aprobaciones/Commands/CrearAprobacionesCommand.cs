@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Aprobaciones;
 using HelpDesk.Domain.Exceptions;
@@ -28,8 +27,15 @@ internal sealed class CrearAprobacionesCommandHandler(IUnitOfWork _unitOfWork, A
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdAprobador == Guid.Empty)
+            {
+                throw new ValidationException("IdAprobador debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new global::HelpDesk.Domain.Models.Aprobaciones()
             {
                 IdAprobacion = Guid.NewGuid(),
@@ -43,10 +49,16 @@ internal sealed class CrearAprobacionesCommandHandler(IUnitOfWork _unitOfWork, A
                 Estado = "pendiente"
             };
             if (true) entity.IdSolicitante = actor.Id;
-            Validation.Require(entity.IdAprobador != entity.IdSolicitante, "No se permite autoaprobacion.");
+            if (!(entity.IdAprobador != entity.IdSolicitante))
+            {
+                throw new BusinessException(400, "No se permite autoaprobacion.");
+            }
             var approver = await Required<global::HelpDesk.Domain.Models.Usuarios>(entity.IdAprobador);
             var approverRoles = _unitOfWork.Repository<global::HelpDesk.Domain.Models.UsuariosRoles>().Query().Where(x => x.IdUsuario == approver.IdUsuario).Select(x => x.IdRol);
-            Validation.Require(approver.Activo && _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().Query().Any(x => approverRoles.Contains(x.IdRol) && x.Nombre == "aprobador"), "El usuario debe tener rol aprobador y estar activo.");
+            if (!(approver.Activo && _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().Query().Any(x => approverRoles.Contains(x.IdRol) && x.Nombre == "aprobador")))
+            {
+                throw new BusinessException(400, "El usuario debe tener rol aprobador y estar activo.");
+            }
             if (entity.IdTicket is Guid approvalTicket) access.EnsureRead(await Required<global::HelpDesk.Domain.Models.Tickets>(approvalTicket));
             if (entity.IdCambio is Guid approvalChange) access.EnsureRead(await Required<global::HelpDesk.Domain.Models.Cambios>(approvalChange));
             await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Aprobaciones>().AddAsync(entity);
@@ -65,6 +77,10 @@ internal sealed class CrearAprobacionesCommandHandler(IUnitOfWork _unitOfWork, A
                 FechaSolicitud = entity.FechaSolicitud,
                 FechaDecision = entity.FechaDecision
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<AprobacionesResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

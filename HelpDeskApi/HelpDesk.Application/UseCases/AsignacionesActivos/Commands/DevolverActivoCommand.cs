@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
@@ -25,16 +24,27 @@ internal sealed class DevolverActivoCommandHandler(IUnitOfWork _unitOfWork, Acce
     {
         try
         {
-            Validation.Check(r);
+            Validator.ValidateObject(r, new ValidationContext(r), validateAllProperties: true);
+            if (r.Id == Guid.Empty)
+            {
+                throw new ValidationException("Id debe ser un identificador valido.");
+            }
             var result = "completado";
             access.Permission("activos.administrar");
             var assignment = await Required<global::HelpDesk.Domain.Models.AsignacionesActivos>(r.Id);
-            Validation.Require(assignment.FechaDevolucion is null, "Ya fue devuelto.", 409);
+            if (!(assignment.FechaDevolucion is null))
+            {
+                throw new BusinessException(409, "Ya fue devuelto.");
+            }
             assignment.FechaDevolucion = DateTime.UtcNow;
             (await Required<global::HelpDesk.Domain.Models.Activos>(assignment.IdActivo)).Estado = "disponible";
             result = "devuelto";
             await _unitOfWork.Complete();
             return new ResponseDto<AccionResultadoDto>(200, new AccionResultadoDto(r.Id, result));
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<AccionResultadoDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

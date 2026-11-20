@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.PreferenciasNotificaciones;
@@ -31,8 +30,15 @@ internal sealed class ActualizarPreferenciasNotificacionesCommandHandler(IUnitOf
     {
         try
         {
-            Validation.Check(request);
-            Validation.Require(!string.IsNullOrWhiteSpace(request.TipoEvento), "Indique el tipo de evento.");
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdUsuario == Guid.Empty)
+            {
+                throw new ValidationException("IdUsuario debe ser un identificador valido.");
+            }
+            if (!(!string.IsNullOrWhiteSpace(request.TipoEvento)))
+            {
+                throw new BusinessException(400, "Indique el tipo de evento.");
+            }
             if (!access.Admin && request.IdUsuario != actor.Id)
             {
                 access.Permission("usuarios.administrar");
@@ -60,6 +66,10 @@ internal sealed class ActualizarPreferenciasNotificacionesCommandHandler(IUnitOf
             };
 
             return new ResponseDto<PreferenciasNotificacionesResponseDto>(200, dto, "Preferencia actualizada correctamente.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<PreferenciasNotificacionesResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

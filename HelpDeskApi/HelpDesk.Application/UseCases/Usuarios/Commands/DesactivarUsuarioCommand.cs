@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
 using Microsoft.EntityFrameworkCore;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
@@ -26,7 +25,11 @@ internal sealed class DesactivarUsuarioCommandHandler(IUnitOfWork _unitOfWork, A
     {
         try
         {
-            Validation.Check(r);
+            Validator.ValidateObject(r, new ValidationContext(r), validateAllProperties: true);
+            if (r.Id == Guid.Empty)
+            {
+                throw new ValidationException("Id debe ser un identificador valido.");
+            }
             var result = "completado";
             access.Permission("usuarios.administrar");
             var user = await Required<global::HelpDesk.Domain.Models.Usuarios>(r.Id);
@@ -35,6 +38,10 @@ internal sealed class DesactivarUsuarioCommandHandler(IUnitOfWork _unitOfWork, A
             result = user.Activo ? "activo" : "inactivo";
             await _unitOfWork.Complete();
             return new ResponseDto<AccionResultadoDto>(200, new AccionResultadoDto(r.Id, result));
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<AccionResultadoDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {
@@ -53,7 +60,9 @@ internal sealed class DesactivarUsuarioCommandHandler(IUnitOfWork _unitOfWork, A
         var roleIds = _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().Query().Where(r => r.Nombre == "administrador").Select(r => r.IdRol);
         if (!_unitOfWork.Repository<global::HelpDesk.Domain.Models.UsuariosRoles>().Query().Any(r => r.IdUsuario == userId && roleIds.Contains(r.IdRol))) return;
         var others = _unitOfWork.Repository<global::HelpDesk.Domain.Models.UsuariosRoles>().Query().Where(r => roleIds.Contains(r.IdRol) && r.IdUsuario != userId).Select(r => r.IdUsuario);
-        Validation.Require(await (_unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().Query().Where(u => u.Activo && others.Contains(u.IdUsuario))).CountAsync() > 0,
-            "Debe conservarse al menos un administrador activo.", 409);
+        if (!(await(_unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().Query().Where(u => u.Activo && others.Contains(u.IdUsuario))).CountAsync() > 0))
+        {
+            throw new BusinessException(409, "Debe conservarse al menos un administrador activo.");
+        }
     }
 }

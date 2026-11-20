@@ -1,6 +1,5 @@
 using HelpDesk.Domain.Dtos.Common;
 using Microsoft.EntityFrameworkCore;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.AsignacionesTickets;
 using HelpDesk.Domain.Exceptions;
@@ -24,8 +23,10 @@ internal sealed class ListarAsignacionesTicketsQueryHandler(IUnitOfWork _unitOfW
         try
         {
 
-            Validation.Require(request.Pagina >= 1 && request.Pagina <= 1000000 && request.Tamano is >= 1 and <= 100,
-            "Pagina debe ser positiva y tamano debe estar entre 1 y 100.");
+            if (!(request.Pagina >= 1 && request.Pagina <= 1000000 && request.Tamano is >= 1 and <= 100))
+            {
+                throw new BusinessException(400, "Pagina debe ser positiva y tamano debe estar entre 1 y 100.");
+            }
             var query = access.Scope(_unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesTickets>().Query());
             if (!string.IsNullOrWhiteSpace(request.Buscar)) query = query.Where(x => x.Motivo.Contains(request.Buscar));
             if (request.IdTicket.HasValue) query = query.Where(x => x.IdTicket == request.IdTicket.Value);

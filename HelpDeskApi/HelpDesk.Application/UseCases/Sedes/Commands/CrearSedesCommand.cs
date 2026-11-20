@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.Sedes;
@@ -27,13 +26,16 @@ internal sealed class CrearSedesCommandHandler(IUnitOfWork _unitOfWork, AccessRu
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
             if (!access.Admin) access.Permission("organizacion.administrar");
 
             var repo = _unitOfWork.Repository<Domain.Models.Sedes>();
 
             var existeNombre = await repo.Query().AnyAsync(s => s.Nombre.ToLower() == request.Nombre.Trim().ToLower(), ct);
-            Validation.Require(!existeNombre, "Ya existe una sede con el mismo nombre.");
+            if (!(!existeNombre))
+            {
+                throw new BusinessException(400, "Ya existe una sede con el mismo nombre.");
+            }
 
             var entity = new Domain.Models.Sedes
             {
@@ -55,6 +57,10 @@ internal sealed class CrearSedesCommandHandler(IUnitOfWork _unitOfWork, AccessRu
             };
 
             return new ResponseDto<SedesResponseDto>(201, dto, "Sede creada correctamente.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<SedesResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

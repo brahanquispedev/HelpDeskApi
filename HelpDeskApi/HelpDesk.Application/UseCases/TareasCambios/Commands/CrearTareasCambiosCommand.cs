@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.TareasCambios;
 using HelpDesk.Domain.Exceptions;
@@ -30,8 +29,15 @@ internal sealed class CrearTareasCambiosCommandHandler(IUnitOfWork _unitOfWork, 
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdCambio == Guid.Empty)
+            {
+                throw new ValidationException("IdCambio debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new global::HelpDesk.Domain.Models.TareasCambios()
             {
                 IdTareaCambio = Guid.NewGuid(),
@@ -59,6 +65,10 @@ internal sealed class CrearTareasCambiosCommandHandler(IUnitOfWork _unitOfWork, 
                 FechaCreacion = entity.FechaCreacion,
                 FechaFinalizacion = entity.FechaFinalizacion
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<TareasCambiosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

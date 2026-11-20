@@ -1,6 +1,5 @@
 using HelpDesk.Domain.Dtos.Common;
 using Microsoft.EntityFrameworkCore;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.CambiosTickets;
 using HelpDesk.Domain.Exceptions;
@@ -22,8 +21,10 @@ internal sealed class ListarCambiosTicketsQueryHandler(IUnitOfWork _unitOfWork, 
         try
         {
 
-            Validation.Require(request.Pagina >= 1 && request.Pagina <= 1000000 && request.Tamano is >= 1 and <= 100,
-            "Pagina debe ser positiva y tamano debe estar entre 1 y 100.");
+            if (!(request.Pagina >= 1 && request.Pagina <= 1000000 && request.Tamano is >= 1 and <= 100))
+            {
+                throw new BusinessException(400, "Pagina debe ser positiva y tamano debe estar entre 1 y 100.");
+            }
             var query = access.Scope(_unitOfWork.Repository<Dictionary<string, object>>("CambiosTickets").Query());
 
             var total = await (query).CountAsync();

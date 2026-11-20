@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.PreferenciasNotificaciones;
@@ -28,18 +27,28 @@ internal sealed class CrearPreferenciasNotificacionesCommandHandler(IUnitOfWork 
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdUsuario == Guid.Empty)
+            {
+                throw new ValidationException("IdUsuario debe ser un identificador valido.");
+            }
             if (!access.Admin && request.IdUsuario != actor.Id)
             {
                 access.Permission("usuarios.administrar");
             }
 
             var usuario = await _unitOfWork.Repository<Domain.Models.Usuarios>().GetByIdAsync([request.IdUsuario]);
-            Validation.Require(usuario != null, "El usuario especificado no existe.");
+            if (!(usuario != null))
+            {
+                throw new BusinessException(400, "El usuario especificado no existe.");
+            }
 
             var repo = _unitOfWork.Repository<Domain.Models.PreferenciasNotificaciones>();
             var existente = await repo.GetByIdAsync([request.IdUsuario, request.TipoEvento.Trim()]);
-            Validation.Require(existente == null, "La preferencia para este tipo de evento ya está configurada.");
+            if (!(existente == null))
+            {
+                throw new BusinessException(400, "La preferencia para este tipo de evento ya está configurada.");
+            }
 
             var entity = new Domain.Models.PreferenciasNotificaciones
             {
@@ -61,6 +70,10 @@ internal sealed class CrearPreferenciasNotificacionesCommandHandler(IUnitOfWork 
             };
 
             return new ResponseDto<PreferenciasNotificacionesResponseDto>(201, dto, "Preferencia registrada correctamente.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<PreferenciasNotificacionesResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

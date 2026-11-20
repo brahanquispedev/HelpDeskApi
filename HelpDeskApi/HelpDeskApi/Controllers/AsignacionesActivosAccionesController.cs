@@ -1,6 +1,5 @@
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Application.UseCases.AsignacionesActivos.Commands;
-using HelpDesk.Application.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

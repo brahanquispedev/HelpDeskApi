@@ -1,4 +1,4 @@
-using HelpDesk.Application.Common;
+using System.ComponentModel.DataAnnotations;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.IntegrantesEquipo;
@@ -22,20 +22,43 @@ internal sealed class CrearIntegrantesEquipoCommandHandler(IUnitOfWork _unitOfWo
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdEquipo == Guid.Empty)
+            {
+                throw new ValidationException("IdEquipo debe ser un identificador valido.");
+            }
+            if (request.IdUsuario == Guid.Empty)
+            {
+                throw new ValidationException("IdUsuario debe ser un identificador valido.");
+            }
             if (!access.Admin) access.Permission("organizacion.administrar");
 
             var equipo = await _unitOfWork.Repository<Domain.Models.EquiposSoporte>().GetByIdAsync([request.IdEquipo]);
-            Validation.Require(equipo != null, "El equipo de soporte no existe.");
-            Validation.Require(equipo!.Activo, "El equipo de soporte está inactivo.");
+            if (!(equipo != null))
+            {
+                throw new BusinessException(400, "El equipo de soporte no existe.");
+            }
+            if (!(equipo!.Activo))
+            {
+                throw new BusinessException(400, "El equipo de soporte está inactivo.");
+            }
 
             var usuario = await _unitOfWork.Repository<Domain.Models.Usuarios>().GetByIdAsync([request.IdUsuario]);
-            Validation.Require(usuario != null, "El usuario no existe.");
-            Validation.Require(usuario!.Activo, "El usuario está inactivo.");
+            if (!(usuario != null))
+            {
+                throw new BusinessException(400, "El usuario no existe.");
+            }
+            if (!(usuario!.Activo))
+            {
+                throw new BusinessException(400, "El usuario está inactivo.");
+            }
 
             var repo = _unitOfWork.Repository<Domain.Models.IntegrantesEquipo>();
             var existente = await repo.GetByIdAsync([request.IdEquipo, request.IdUsuario]);
-            Validation.Require(existente == null, "El usuario ya forma parte de este equipo.");
+            if (!(existente == null))
+            {
+                throw new BusinessException(400, "El usuario ya forma parte de este equipo.");
+            }
 
             var entity = new Domain.Models.IntegrantesEquipo
             {
@@ -59,6 +82,10 @@ internal sealed class CrearIntegrantesEquipoCommandHandler(IUnitOfWork _unitOfWo
             };
 
             return new ResponseDto<IntegrantesEquipoResponseDto>(201, dto, "Integrante asignado al equipo correctamente.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<IntegrantesEquipoResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

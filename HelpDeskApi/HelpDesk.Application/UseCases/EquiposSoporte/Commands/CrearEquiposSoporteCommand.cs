@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.EquiposSoporte;
@@ -27,7 +26,7 @@ internal sealed class CrearEquiposSoporteCommandHandler(IUnitOfWork _unitOfWork,
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
             if (!access.Admin) access.Permission("organizacion.administrar");
 
             var repo = _unitOfWork.Repository<Domain.Models.EquiposSoporte>();
@@ -36,7 +35,10 @@ internal sealed class CrearEquiposSoporteCommandHandler(IUnitOfWork _unitOfWork,
                 e => e.Nombre.ToLower() == request.Nombre.Trim().ToLower(), 
                 ct
             );
-            Validation.Require(!existeNombre, "Ya existe un equipo de soporte con el mismo nombre.");
+            if (!(!existeNombre))
+            {
+                throw new BusinessException(400, "Ya existe un equipo de soporte con el mismo nombre.");
+            }
 
             var entity = new Domain.Models.EquiposSoporte
             {
@@ -58,6 +60,10 @@ internal sealed class CrearEquiposSoporteCommandHandler(IUnitOfWork _unitOfWork,
             };
 
             return new ResponseDto<EquiposSoporteResponseDto>(201, dto, "Equipo de soporte creado correctamente.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<EquiposSoporteResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

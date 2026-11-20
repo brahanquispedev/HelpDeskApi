@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Areas;
 using HelpDesk.Domain.Dtos.Common;
@@ -26,13 +25,23 @@ internal sealed class CrearAreasCommandHandler(IUnitOfWork _unitOfWork, AccessRu
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdSede == Guid.Empty)
+            {
+                throw new ValidationException("IdSede debe ser un identificador valido.");
+            }
             if (!access.Admin) access.Permission("organizacion.administrar");
 
             // Validar que la sede padre exista
             var sede = await _unitOfWork.Repository<Domain.Models.Sedes>().GetByIdAsync([request.IdSede]);
-            Validation.Require(sede != null, "La sede especificada no existe.");
-            Validation.Require(sede!.Activo, "No se pueden crear areas en una sede inactiva.");
+            if (!(sede != null))
+            {
+                throw new BusinessException(400, "La sede especificada no existe.");
+            }
+            if (!(sede!.Activo))
+            {
+                throw new BusinessException(400, "No se pueden crear areas en una sede inactiva.");
+            }
 
             var repo = _unitOfWork.Repository<Domain.Models.Areas>();
 
@@ -41,7 +50,10 @@ internal sealed class CrearAreasCommandHandler(IUnitOfWork _unitOfWork, AccessRu
                 a => a.IdSede == request.IdSede && a.Nombre.ToLower() == request.Nombre.Trim().ToLower(), 
                 ct
             );
-            Validation.Require(!existeNombre, "Ya existe un area con el mismo nombre en esta sede.");
+            if (!(!existeNombre))
+            {
+                throw new BusinessException(400, "Ya existe un area con el mismo nombre en esta sede.");
+            }
 
             var entity = new Domain.Models.Areas
             {
@@ -63,6 +75,10 @@ internal sealed class CrearAreasCommandHandler(IUnitOfWork _unitOfWork, AccessRu
             };
 
             return new ResponseDto<AreasResponseDto>(201, dto, "Area creada correctamente.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<AreasResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

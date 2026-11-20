@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.PoliticasAtencion;
 using HelpDesk.Domain.Exceptions;
@@ -26,8 +25,11 @@ internal sealed class CrearPoliticasAtencionCommandHandler(IUnitOfWork _unitOfWo
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new global::HelpDesk.Domain.Models.PoliticasAtencion()
             {
                 IdPolitica = Guid.NewGuid(),
@@ -47,6 +49,10 @@ internal sealed class CrearPoliticasAtencionCommandHandler(IUnitOfWork _unitOfWo
                 MinutosResolucion = entity.MinutosResolucion,
                 Activo = entity.Activo
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<PoliticasAtencionResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

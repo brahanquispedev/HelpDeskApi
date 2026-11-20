@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.CategoriasConocimiento;
 using HelpDesk.Domain.Exceptions;
@@ -21,7 +20,10 @@ internal sealed class EliminarCategoriasConocimientoCommandHandler(IUnitOfWork _
     {
         try
         {
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.CategoriasConocimiento>().GetByIdAsync(request.Keys)
                          ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);

@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.Notificaciones;
@@ -38,17 +37,30 @@ internal sealed class CrearNotificacionesCommandHandler(IUnitOfWork _unitOfWork,
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdUsuario == Guid.Empty)
+            {
+                throw new ValidationException("IdUsuario debe ser un identificador valido.");
+            }
             if (!access.Admin) access.Permission("usuarios.administrar");
 
             var usuario = await _unitOfWork.Repository<Domain.Models.Usuarios>().GetByIdAsync([request.IdUsuario]);
-            Validation.Require(usuario != null, "El usuario destinatario no existe.");
-            Validation.Require(usuario!.Activo, "El usuario destinatario esta inactivo.");
+            if (!(usuario != null))
+            {
+                throw new BusinessException(400, "El usuario destinatario no existe.");
+            }
+            if (!(usuario!.Activo))
+            {
+                throw new BusinessException(400, "El usuario destinatario esta inactivo.");
+            }
 
             if (request.IdTicket.HasValue)
             {
                 var ticket = await _unitOfWork.Repository<Domain.Models.Tickets>().GetByIdAsync([request.IdTicket.Value]);
-                Validation.Require(ticket != null, "El ticket asociado no existe.");
+                if (!(ticket != null))
+                {
+                    throw new BusinessException(400, "El ticket asociado no existe.");
+                }
             }
 
             var entity = new Domain.Models.Notificaciones
@@ -81,6 +93,10 @@ internal sealed class CrearNotificacionesCommandHandler(IUnitOfWork _unitOfWork,
             };
 
             return new ResponseDto<NotificacionesResponseDto>(201, dto, "Notificacion creada correctamente.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<NotificacionesResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

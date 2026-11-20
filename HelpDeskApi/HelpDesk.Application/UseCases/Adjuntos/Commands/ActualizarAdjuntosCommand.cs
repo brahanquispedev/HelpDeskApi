@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Adjuntos;
 using HelpDesk.Domain.Exceptions;
@@ -35,8 +34,15 @@ internal sealed class ActualizarAdjuntosCommandHandler(IUnitOfWork _unitOfWork, 
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdTicket == Guid.Empty)
+            {
+                throw new ValidationException("IdTicket debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Adjuntos>().GetByIdAsync(request.Keys)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
@@ -54,7 +60,10 @@ internal sealed class ActualizarAdjuntosCommandHandler(IUnitOfWork _unitOfWork, 
             if (entity.IdComentario is Guid commentId)
             {
                 var parent = await Required<global::HelpDesk.Domain.Models.Comentarios>(commentId);
-                Validation.Require(parent.IdTicket == entity.IdTicket, "El comentario pertenece a otro ticket.");
+                if (!(parent.IdTicket == entity.IdTicket))
+                {
+                    throw new BusinessException(400, "El comentario pertenece a otro ticket.");
+                }
                 if (parent.EsInterno) entity.EsInterno = true;
             }
 
@@ -71,6 +80,10 @@ internal sealed class ActualizarAdjuntosCommandHandler(IUnitOfWork _unitOfWork, 
                 EsInterno = entity.EsInterno,
                 Fecha = entity.Fecha
             }, "Registro actualizado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<AdjuntosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

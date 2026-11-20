@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Application.Services;
 using HelpDesk.Domain.Exceptions;
@@ -32,15 +31,28 @@ internal sealed class CerrarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurre
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdTicket == Guid.Empty)
+            {
+                throw new ValidationException("IdTicket debe ser un identificador valido.");
+            }
             var t = await Required<global::HelpDesk.Domain.Models.Tickets>(request.IdTicket);
             access.EnsureRead(t);
-            Validation.Require(t.Version == request.Version, "El ticket cambio; consulte su version actual.", 409);
+            if (!(t.Version == request.Version))
+            {
+                throw new BusinessException(409, "El ticket cambio; consulte su version actual.");
+            }
             var before = t.Estado;
             var now = DateTime.UtcNow;
-            Validation.Require(t.IdSolicitante == actor.Id, "Solo el solicitante confirma el cierre.", 403);
+            if (!(t.IdSolicitante == actor.Id))
+            {
+                throw new BusinessException(403, "Solo el solicitante confirma el cierre.");
+            }
             access.Permission("tickets.confirmar_propios");
-            Validation.Require(t.Estado == "resuelto", "Debe estar resuelto.", 409);
+            if (!(t.Estado == "resuelto"))
+            {
+                throw new BusinessException(409, "Debe estar resuelto.");
+            }
             t.Estado = "cerrado";
             t.FechaCierre = now;
             var asignacion = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesTickets>()
@@ -82,6 +94,10 @@ internal sealed class CerrarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurre
                 FechaCancelacion = t.FechaCancelacion,
                 Version = t.Version
             }, "Accion completada.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<TicketsResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

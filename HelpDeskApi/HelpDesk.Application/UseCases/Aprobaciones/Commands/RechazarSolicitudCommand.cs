@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
 using Microsoft.EntityFrameworkCore;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
@@ -26,21 +25,41 @@ internal sealed class RechazarSolicitudCommandHandler(IUnitOfWork _unitOfWork, I
     {
         try
         {
-            Validation.Check(r);
+            Validator.ValidateObject(r, new ValidationContext(r), validateAllProperties: true);
+            if (r.Id == Guid.Empty)
+            {
+                throw new ValidationException("Id debe ser un identificador valido.");
+            }
             var result = "completado";
             access.Permission("aprobaciones.decidir");
             var a = await Required<global::HelpDesk.Domain.Models.Aprobaciones>(r.Id);
-            Validation.Require(a.IdAprobador == actor.Id, "Solo el aprobador asignado puede decidir.", 403);
-            Validation.Require(a.Estado == "pendiente", "Ya fue decidida.", 409);
+            if (!(a.IdAprobador == actor.Id))
+            {
+                throw new BusinessException(403, "Solo el aprobador asignado puede decidir.");
+            }
+            if (!(a.Estado == "pendiente"))
+            {
+                throw new BusinessException(409, "Ya fue decidida.");
+            }
             var previous = await (_unitOfWork.Repository<global::HelpDesk.Domain.Models.Aprobaciones>().Query().Where(x => x.IdTicket == a.IdTicket && x.IdCambio == a.IdCambio && x.Orden < a.Orden)).ToListAsync();
-            Validation.Require(previous.All(x => x.Estado == "aprobado"), "Complete los pasos anteriores en orden.", 409);
-            Validation.Require(!string.IsNullOrWhiteSpace(r.Motivo), "Indique el motivo de la decision.");
+            if (!(previous.All(x => x.Estado == "aprobado")))
+            {
+                throw new BusinessException(409, "Complete los pasos anteriores en orden.");
+            }
+            if (!(!string.IsNullOrWhiteSpace(r.Motivo)))
+            {
+                throw new BusinessException(400, "Indique el motivo de la decision.");
+            }
             a.Estado = "rechazado";
             a.FechaDecision = DateTime.UtcNow;
             a.ComentarioDecision = r.Motivo;
             result = a.Estado;
             await _unitOfWork.Complete();
             return new ResponseDto<AccionResultadoDto>(200, new AccionResultadoDto(r.Id, result));
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<AccionResultadoDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

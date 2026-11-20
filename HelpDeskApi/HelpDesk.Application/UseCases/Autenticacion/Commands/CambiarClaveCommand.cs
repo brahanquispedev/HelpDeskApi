@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using HelpDesk.Application.Common;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
@@ -28,7 +27,7 @@ internal sealed class CambiarClaveCommandHandler(
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
 
             if (!_actor.IsAuthenticated)
                 throw new BusinessException(401, "Inicie sesion.");
@@ -36,15 +35,28 @@ internal sealed class CambiarClaveCommandHandler(
             var usuario = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().Query()
                 .FirstOrDefaultAsync(u => u.IdUsuario == _actor.Id, ct);
 
-            Validation.Require(usuario is not null, "Usuario no encontrado.", 404);
-            Validation.Require(_passwordService.Verify(usuario!.ClaveHash, request.ClaveActual), "La clave actual es incorrecta.", 401);
-            Validation.Require(request.ClaveActual != request.ClaveNueva, "La nueva clave debe ser diferente a la actual.", 400);
+            if (!(usuario is not null))
+            {
+                throw new BusinessException(404, "Usuario no encontrado.");
+            }
+            if (!(_passwordService.Verify(usuario!.ClaveHash, request.ClaveActual)))
+            {
+                throw new BusinessException(401, "La clave actual es incorrecta.");
+            }
+            if (!(request.ClaveActual != request.ClaveNueva))
+            {
+                throw new BusinessException(400, "La nueva clave debe ser diferente a la actual.");
+            }
 
             usuario.ClaveHash = _passwordService.Hash(request.ClaveNueva);
             _unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().Update(usuario);
             await _unitOfWork.Complete();
 
             return new ResponseDto<OperacionDto>(200, new OperacionDto(true));
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<OperacionDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

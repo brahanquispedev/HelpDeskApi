@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Tickets;
 using HelpDesk.Domain.Exceptions;
@@ -38,15 +37,27 @@ internal sealed class ActualizarTicketsCommandHandler(IUnitOfWork _unitOfWork, A
         try
         {
 
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdServicio == Guid.Empty)
+            {
+                throw new ValidationException("IdServicio debe ser un identificador valido.");
+            }
             if (!access.Admin) access.Permission("tickets.crear");
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Tickets>().GetByIdAsync(request.Keys)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
-            Validation.Require(request.Version == entity.Version, "La version del ticket cambio; vuelva a consultarlo.", 409);
-            Validation.Require(entity.Estado == "nuevo" && (access.Admin || entity.IdSolicitante == actor.Id), "Solo se edita el texto de un ticket propio nuevo.", 403);
-            Validation.Require(request.IdServicio == entity.IdServicio && request.Prioridad == entity.Prioridad && request.Tipo == entity.Tipo,
-            "Este PUT solo cambia asunto y descripcion; servicio, prioridad y tipo se conservan.");
+            if (!(request.Version == entity.Version))
+            {
+                throw new BusinessException(409, "La version del ticket cambio; vuelva a consultarlo.");
+            }
+            if (!(entity.Estado == "nuevo" && (access.Admin || entity.IdSolicitante == actor.Id)))
+            {
+                throw new BusinessException(403, "Solo se edita el texto de un ticket propio nuevo.");
+            }
+            if (!(request.IdServicio == entity.IdServicio && request.Prioridad == entity.Prioridad && request.Tipo == entity.Tipo))
+            {
+                throw new BusinessException(400, "Este PUT solo cambia asunto y descripcion; servicio, prioridad y tipo se conservan.");
+            }
             entity.Asunto = request.Asunto;
             entity.Descripcion = request.Descripcion;
 
@@ -84,6 +95,10 @@ internal sealed class ActualizarTicketsCommandHandler(IUnitOfWork _unitOfWork, A
                 FechaCancelacion = entity.FechaCancelacion,
                 Version = entity.Version
             }, "Registro actualizado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<TicketsResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

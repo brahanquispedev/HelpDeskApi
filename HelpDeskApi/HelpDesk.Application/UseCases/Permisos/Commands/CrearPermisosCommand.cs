@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Permisos;
 using HelpDesk.Domain.Exceptions;
@@ -30,8 +29,11 @@ internal sealed class CrearPermisosCommandHandler(IUnitOfWork _unitOfWork, Acces
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new global::HelpDesk.Domain.Models.Permisos()
             {
                 IdPermiso = Guid.NewGuid(),
@@ -49,6 +51,10 @@ internal sealed class CrearPermisosCommandHandler(IUnitOfWork _unitOfWork, Acces
                 Modulo = entity.Modulo,
                 Descripcion = entity.Descripcion
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<PermisosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

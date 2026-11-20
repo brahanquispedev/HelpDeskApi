@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Activos;
 using HelpDesk.Domain.Dtos.Common;
@@ -45,33 +44,58 @@ internal sealed class CrearActivoCommandHandler(IUnitOfWork _unitOfWork, AccessR
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdSede == Guid.Empty)
+            {
+                throw new ValidationException("IdSede debe ser un identificador valido.");
+            }
+            if (request.IdTipoActivo == Guid.Empty)
+            {
+                throw new ValidationException("IdTipoActivo debe ser un identificador valido.");
+            }
             if (!access.Admin) access.Permission("activos.administrar");
 
             var codigo = request.CodigoPatrimonial.Trim();
             var existeCodigo = await _unitOfWork.Repository<ActivoEntity>().Query()
                 .AnyAsync(x => x.CodigoPatrimonial.ToLower() == codigo.ToLower(), ct);
-            Validation.Require(!existeCodigo, "Ya existe un activo con ese codigo patrimonial.", 409);
+            if (!(!existeCodigo))
+            {
+                throw new BusinessException(409, "Ya existe un activo con ese codigo patrimonial.");
+            }
 
             var sede = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Sedes>().GetByIdAsync([request.IdSede])
                 ?? throw new BusinessException(400, "Sede no encontrada.");
-            Validation.Require(sede.Activo, "La sede esta inactiva.");
+            if (!(sede.Activo))
+            {
+                throw new BusinessException(400, "La sede esta inactiva.");
+            }
 
             var tipo = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.TiposActivos>().GetByIdAsync([request.IdTipoActivo])
                 ?? throw new BusinessException(400, "Tipo de activo no encontrado.");
-            Validation.Require(tipo.Activo, "El tipo de activo esta inactivo.");
+            if (!(tipo.Activo))
+            {
+                throw new BusinessException(400, "El tipo de activo esta inactivo.");
+            }
 
             if (request.IdArea.HasValue)
             {
-                Validation.Require(request.IdArea.Value != Guid.Empty, "IdArea no es valido.");
+                if (!(request.IdArea.Value != Guid.Empty))
+                {
+                    throw new BusinessException(400, "IdArea no es valido.");
+                }
                 var area = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Areas>().GetByIdAsync([request.IdArea.Value])
                     ?? throw new BusinessException(400, "Area no encontrada.");
-                Validation.Require(area.Activo && area.IdSede == request.IdSede,
-                    "El area no pertenece a la sede o esta inactiva.");
+                if (!(area.Activo && area.IdSede == request.IdSede))
+                {
+                    throw new BusinessException(400, "El area no pertenece a la sede o esta inactiva.");
+                }
             }
 
             var estado = request.Estado.Trim().ToLowerInvariant();
-            Validation.Require(estado is "disponible" or "mantenimiento", "Estado inicial no permitido.");
+            if (!(estado is "disponible" or "mantenimiento"))
+            {
+                throw new BusinessException(400, "Estado inicial no permitido.");
+            }
 
             var entity = new ActivoEntity
             {
@@ -92,6 +116,10 @@ internal sealed class CrearActivoCommandHandler(IUnitOfWork _unitOfWork, AccessR
             await _unitOfWork.Complete();
 
             return new ResponseDto<ActivosResponseDto>(201, ToDto(entity), "Activo creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<ActivosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

@@ -1,7 +1,6 @@
 using HelpDesk.Domain.Dtos.Roles;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Exceptions;
@@ -28,13 +27,21 @@ internal sealed class ActualizarRolesCommandHandler(IUnitOfWork _unitOfWork, Acc
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().GetByIdAsync(request.Keys)
                          ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
             if (new[] { "administrador", "empleado", "tecnico", "coordinador", "aprobador" }.Contains(entity.Nombre))
-                Validation.Require(request.Nombre == entity.Nombre, "No se renombra un rol base.", 409);
+                {
+                    if (!(request.Nombre == entity.Nombre))
+                    {
+                        throw new BusinessException(409, "No se renombra un rol base.");
+                    }
+                }
             entity.Nombre = request.Nombre;
             entity.Descripcion = request.Descripcion;
 
@@ -45,6 +52,10 @@ internal sealed class ActualizarRolesCommandHandler(IUnitOfWork _unitOfWork, Acc
                 Nombre = entity.Nombre,
                 Descripcion = entity.Descripcion
             }, "Registro actualizado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<RolesResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

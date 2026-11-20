@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.AsignacionesActivos;
 using HelpDesk.Domain.Exceptions;
@@ -23,8 +22,19 @@ internal sealed class CrearAsignacionesActivosCommandHandler(IUnitOfWork _unitOf
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdActivo == Guid.Empty)
+            {
+                throw new ValidationException("IdActivo debe ser un identificador valido.");
+            }
+            if (request.IdUsuarioResponsable == Guid.Empty)
+            {
+                throw new ValidationException("IdUsuarioResponsable debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new global::HelpDesk.Domain.Models.AsignacionesActivos()
             {
                 IdAsignacion = Guid.NewGuid(),
@@ -34,8 +44,14 @@ internal sealed class CrearAsignacionesActivosCommandHandler(IUnitOfWork _unitOf
                 FechaAsignacion = DateTime.UtcNow
             };
             var asset = await Required<global::HelpDesk.Domain.Models.Activos>(entity.IdActivo);
-            Validation.Require(asset.Estado == "disponible", "El activo no esta disponible.", 409);
-            Validation.Require((await Required<global::HelpDesk.Domain.Models.Usuarios>(entity.IdUsuarioResponsable)).Activo, "El responsable esta inactivo.");
+            if (!(asset.Estado == "disponible"))
+            {
+                throw new BusinessException(409, "El activo no esta disponible.");
+            }
+            if (!((await Required<global::HelpDesk.Domain.Models.Usuarios>(entity.IdUsuarioResponsable)).Activo))
+            {
+                throw new BusinessException(400, "El responsable esta inactivo.");
+            }
             entity.IdUsuarioAsignador = actor.Id;
             asset.Estado = "asignado";
             await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesActivos>().AddAsync(entity);
@@ -50,6 +66,10 @@ internal sealed class CrearAsignacionesActivosCommandHandler(IUnitOfWork _unitOf
                 FechaDevolucion = entity.FechaDevolucion,
                 Observaciones = entity.Observaciones
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<AsignacionesActivosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

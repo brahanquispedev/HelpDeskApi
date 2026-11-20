@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.UsuariosRoles;
 using HelpDesk.Domain.Exceptions;
@@ -22,8 +21,19 @@ internal sealed class CrearUsuariosRolesCommandHandler(IUnitOfWork _unitOfWork, 
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdUsuario == Guid.Empty)
+            {
+                throw new ValidationException("IdUsuario debe ser un identificador valido.");
+            }
+            if (request.IdRol == Guid.Empty)
+            {
+                throw new ValidationException("IdRol debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new global::HelpDesk.Domain.Models.UsuariosRoles()
             {
                 IdUsuario = request.IdUsuario,
@@ -40,6 +50,10 @@ internal sealed class CrearUsuariosRolesCommandHandler(IUnitOfWork _unitOfWork, 
                 IdRol = entity.IdRol,
                 FechaAsignacion = entity.FechaAsignacion
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<UsuariosRolesResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {
