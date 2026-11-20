@@ -5,7 +5,7 @@ using HelpDesk.Domain.Ports;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace HelpDesk.Infrastructure.Services;
+namespace HelpDesk.Application.Services;
 
 public class JwtService : ITokenService
 {
