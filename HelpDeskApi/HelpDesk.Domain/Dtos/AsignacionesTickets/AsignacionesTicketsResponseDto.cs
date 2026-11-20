@@ -10,6 +10,8 @@ public class AsignacionesTicketsResponseDto
     { get; set; }
     public Guid? IdTecnico
     { get; set; }
+    public string? NombreEquipo { get; set; }
+    public string? NombreTecnico { get; set; }
     public Guid IdAsignador
     { get; set; }
     public DateTime FechaAsignacion

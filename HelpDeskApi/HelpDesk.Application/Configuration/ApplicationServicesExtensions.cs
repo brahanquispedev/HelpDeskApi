@@ -12,6 +12,7 @@ public static class ApplicationServicesExtensions
         services.AddMediatR(typeof(ApplicationServicesExtensions).Assembly);
         services.AddScoped<AccessRules>();
         services.AddScoped<AuthService>();
+        services.AddScoped<TicketNotifications>();
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<ITokenService, JwtService>();
         return services;

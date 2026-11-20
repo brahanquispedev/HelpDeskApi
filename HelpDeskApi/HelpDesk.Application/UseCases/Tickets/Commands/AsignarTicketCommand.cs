@@ -4,6 +4,7 @@ using HelpDesk.Domain.Dtos.Common;
 using Microsoft.EntityFrameworkCore;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
+using HelpDesk.Application.Services;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
@@ -24,7 +25,7 @@ public class AsignarTicketCommand : IRequest<ResponseDto<TicketsResponseDto>>
     public Guid? IdTecnico { get; set; }
 }
 
-internal sealed class AsignarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurrentUser actor, AccessRules access)
+internal sealed class AsignarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurrentUser actor, AccessRules access, TicketNotifications notices)
     : IRequestHandler<AsignarTicketCommand, ResponseDto<TicketsResponseDto>>
 {
     public async Task<ResponseDto<TicketsResponseDto>> Handle(AsignarTicketCommand request, CancellationToken ct)
@@ -46,6 +47,11 @@ internal sealed class AsignarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurr
             Validation.Require(_unitOfWork.Repository<global::HelpDesk.Domain.Models.EquiposSoporte>().Query().Any(e => e.IdEquipo == team && e.Activo), "Equipo inactivo.");
             Validation.Require(_unitOfWork.Repository<global::HelpDesk.Domain.Models.IntegrantesEquipo>().Query().Any(m => m.IdEquipo == team && m.IdUsuario == tech && m.Activo && m.Disponible), "Tecnico no disponible en el equipo.");
             Validation.Require((await Required<global::HelpDesk.Domain.Models.Usuarios>(tech)).Activo, "Tecnico inactivo.");
+            var rolesTecnico = _unitOfWork.Repository<global::HelpDesk.Domain.Models.UsuariosRoles>().Query()
+                .Where(relacion => relacion.IdUsuario == tech).Select(relacion => relacion.IdRol);
+            Validation.Require(await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().Query()
+                .AnyAsync(rol => rolesTecnico.Contains(rol.IdRol) && rol.IdPermiso.Any(permiso => permiso.Codigo == "tickets.atender"), ct),
+                "El integrante no tiene permiso para atender tickets.", 409);
             var asignacion = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesTickets>()
             .Query().SingleOrDefaultAsync(x => x.IdTicket == t.IdTicket && x.FechaFin == null);
             if (asignacion is null)
@@ -73,6 +79,7 @@ internal sealed class AsignarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurr
             await History(t, "asignar", before, t.Estado, request.Motivo);
             t.Version++;
             t.FechaActualizacion = now;
+            await notices.EnqueueAsync(t, TicketEvent.Assigned, [t.IdSolicitante, tech], ct);
             await _unitOfWork.Complete();
             return new ResponseDto<TicketsResponseDto>(200, new TicketsResponseDto
             {

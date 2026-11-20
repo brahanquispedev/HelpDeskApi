@@ -6,6 +6,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 namespace HelpDesk.Application.UseCases.AsignacionesTickets.Queries;
 
 public class ObtenerAsignacionesTicketsQuery : IRequest<ResponseDto<AsignacionesTicketsResponseDto>>
@@ -19,7 +20,9 @@ internal sealed class ObtenerAsignacionesTicketsQueryHandler(IUnitOfWork _unitOf
     {
         try
         {
-            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesTickets>().GetByIdAsync(request.IdAsignacionTicket)
+            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesTickets>().Query()
+                .Include(item => item.IdEquipoNavigation).Include(item => item.IdTecnicoNavigation)
+                .SingleOrDefaultAsync(item => item.IdAsignacionTicket == request.IdAsignacionTicket, ct)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
             return new ResponseDto<AsignacionesTicketsResponseDto>(200, new AsignacionesTicketsResponseDto
@@ -28,6 +31,8 @@ internal sealed class ObtenerAsignacionesTicketsQueryHandler(IUnitOfWork _unitOf
                 IdTicket = entity.IdTicket,
                 IdEquipo = entity.IdEquipo,
                 IdTecnico = entity.IdTecnico,
+                NombreEquipo = entity.IdEquipoNavigation.Nombre,
+                NombreTecnico = entity.IdTecnicoNavigation is { } tecnico ? $"{tecnico.Nombres} {tecnico.Apellidos}" : null,
                 IdAsignador = entity.IdAsignador,
                 FechaAsignacion = entity.FechaAsignacion,
                 FechaFin = entity.FechaFin,

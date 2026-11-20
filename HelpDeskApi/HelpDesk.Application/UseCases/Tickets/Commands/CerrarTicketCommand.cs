@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
+using HelpDesk.Application.Services;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
@@ -24,7 +25,7 @@ public class CerrarTicketCommand : IRequest<ResponseDto<TicketsResponseDto>>
     public Guid? IdTecnico { get; set; }
 }
 
-internal sealed class CerrarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurrentUser actor, AccessRules access)
+internal sealed class CerrarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurrentUser actor, AccessRules access, TicketNotifications notices)
     : IRequestHandler<CerrarTicketCommand, ResponseDto<TicketsResponseDto>>
 {
     public async Task<ResponseDto<TicketsResponseDto>> Handle(CerrarTicketCommand request, CancellationToken ct)
@@ -48,6 +49,7 @@ internal sealed class CerrarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurre
             await History(t, "cerrar", before, t.Estado, request.Motivo);
             t.Version++;
             t.FechaActualizacion = now;
+            await notices.EnqueueAsync(t, TicketEvent.Closed, [t.IdTecnicoAsignado], ct);
             await _unitOfWork.Complete();
             return new ResponseDto<TicketsResponseDto>(200, new TicketsResponseDto
             {

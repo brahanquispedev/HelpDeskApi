@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
+using HelpDesk.Application.Services;
 using HelpDesk.Domain.Dtos.Comentarios;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
@@ -18,7 +19,7 @@ public class CrearComentariosCommand : IRequest<ResponseDto<ComentariosResponseD
     public bool EsInterno { get; set; }
 }
 
-internal sealed class CrearComentariosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor) : IRequestHandler<CrearComentariosCommand, ResponseDto<ComentariosResponseDto>>
+internal sealed class CrearComentariosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor, TicketNotifications notices) : IRequestHandler<CrearComentariosCommand, ResponseDto<ComentariosResponseDto>>
 {
     public async Task<ResponseDto<ComentariosResponseDto>> Handle(CrearComentariosCommand request, CancellationToken ct)
     {
@@ -48,6 +49,8 @@ internal sealed class CrearComentariosCommandHandler(IUnitOfWork _unitOfWork, Ac
             }
 
             await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Comentarios>().AddAsync(entity);
+            if (!entity.EsInterno)
+                await notices.EnqueueAsync(ticket, TicketEvent.PublicComment, [ticket.IdSolicitante, ticket.IdTecnicoAsignado], ct, entity.IdComentario);
             await _unitOfWork.Complete();
             return new ResponseDto<ComentariosResponseDto>(201, new ComentariosResponseDto
             {

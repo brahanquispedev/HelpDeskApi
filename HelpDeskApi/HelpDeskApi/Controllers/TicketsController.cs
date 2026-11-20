@@ -9,6 +9,13 @@ namespace HelpDesk.Api.Controllers;
 [ApiController, Route("api/Tickets"), Authorize]
 public sealed class TicketsController(IMediator mediator) : ControllerBase
 {
+    [HttpGet("{idTicket:guid}/tecnicos-disponibles")]
+    public async Task<IActionResult> ListarTecnicos(Guid idTicket, CancellationToken ct)
+    {
+        var result = await mediator.Send(new ListarTecnicosParaTicketQuery(idTicket), ct);
+        return StatusCode(result.StatusCode, result);
+    }
+
     [HttpGet]
     public async Task<IActionResult> List([FromQuery] ListarTicketsQuery query)
     {

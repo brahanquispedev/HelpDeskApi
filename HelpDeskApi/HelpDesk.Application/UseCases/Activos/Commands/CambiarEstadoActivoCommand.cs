@@ -36,11 +36,12 @@ internal sealed class CambiarEstadoActivoCommandHandler(IUnitOfWork _unitOfWork,
                 ?? throw new BusinessException(404, "Activo no encontrado.");
 
             var estado = request.Estado.Trim().ToLowerInvariant();
-            Validation.Require(estado is "disponible" or "mantenimiento" or "baja", "Estado no permitido.");
-            Validation.Require(entity.Estado != "baja", "El activo esta dado de baja.", 409);
+            if (estado == "baja") estado = "retirado";
+            Validation.Require(estado is "disponible" or "mantenimiento" or "retirado", "Estado no permitido.");
+            Validation.Require(entity.Estado is not ("baja" or "retirado" or "perdido"), "El activo ya no esta operativo.", 409);
             Validation.Require(entity.Estado != estado, "El activo ya se encuentra en ese estado.", 409);
 
-            if (estado == "baja")
+            if (estado == "retirado")
             {
                 var tieneAsignacionVigente = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesActivos>().Query()
                     .AnyAsync(x => x.IdActivo == entity.IdActivo && x.FechaDevolucion == null, ct);

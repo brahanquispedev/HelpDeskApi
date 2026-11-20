@@ -49,9 +49,9 @@ nuevo → asignado → en_atencion → resuelto → cerrado
 
 Asignaciones e historial se mantienen desde las acciones de Tickets. CargaTecnicos y ResumenTickets son recursos de consulta. Auditoria permite consultar los registros disponibles; el registro automático de auditoría queda para otra entrega.
 
-La configuración integrada de `Program.cs` utiliza `AddApplicationServices`, `AddInfrastructureServices`, `AddApiServices` y `UseApiPipeline`. Actualmente la configuración de API publica controladores y `/health`; la activación de Swagger UI y del middleware de excepciones debe completarse en la integración de arranque. Tener sus paquetes o clases presentes no implica que ya estén registrados en el pipeline.
+La configuración integrada de `Program.cs` utiliza `AddApplicationServices`, `AddInfrastructureServices`, `AddApiServices` y `UseApiPipeline`. La API registra Swagger con JWT durante desarrollo, el middleware de excepciones y respuestas uniformes para los errores HTTP. El límite de login y registro es de 20 intentos por minuto y dirección IP. `/health` comprueba el arranque; no sustituye una comprobación de conexión a PostgreSQL.
 
-Esta versión no incluye frontend, proveedor real de correo ni carga física de archivos. Los adjuntos administran metadatos. La recuperación de contraseña y los flujos avanzados se coordinan para entregas posteriores.
+Este repositorio publica el backend; el frontend React se mantiene por separado. Esta versión no incluye proveedor real de correo ni carga física de archivos. Los adjuntos administran metadatos. La recuperación de contraseña y los flujos avanzados se coordinan para entregas posteriores.
 
 ## Clonar y compilar
 
@@ -130,3 +130,58 @@ Cada integrante utiliza su propia cuenta de GitHub y necesita acceso como colabo
 - Comprobar manualmente los endpoints del módulo con datos y permisos apropiados después de compilar.
 
 La revisión final debe comprobar el flujo integrado de login, creación de ticket, asignación, atención, resolución y cierre. La compilación por sí sola no verifica toda la lógica contra la base.
+
+
+## Configuración final para el frontend
+
+La API de desarrollo usa `http://localhost:5086`; el frontend Vite usa
+`http://localhost:5173` y `VITE_API_BASE_URL=http://localhost:5086`.
+Swagger está en `/` y su documento en `/swagger/v1/swagger.json`, durante desarrollo.
+
+`Cors:AllowedOrigins` contiene los orígenes exactos autorizados. En desarrollo se
+permite `http://localhost:5173`; para otro puerto u host hay que declararlo
+explícitamente. En producción no se habilitan orígenes por defecto: configura
+`Cors__AllowedOrigins__0`, `Cors__AllowedOrigins__1`, etc. No se utiliza `*` ni cookies
+de autenticación. Cada petición protegida envía `Authorization: Bearer <token>`.
+
+Configura `ConnectionStrings:DefaultConnection`, `Jwt:Key`, `Jwt:Issuer` y
+`Jwt:Audience` mediante User Secrets en desarrollo o variables del entorno en
+producción. La clave de firma debe tener al menos 32 bytes. Nunca la incluyas en
+el frontend ni en archivos versionados. En producción utiliza HTTPS y el origen
+real del frontend.
+
+### Administrador inicial
+
+Con la base de 36 tablas preparada y sus roles iniciales cargados, ejecuta desde
+la raíz del repositorio:
+
+```powershell
+.\HelpDeskApi\scripts\Crear-Administrador.ps1 -NombreUsuario admin -Correo admin@example.com
+```
+
+Sustituye el correo de ejemplo. El script solicita la contraseña de forma oculta,
+ejecuta el modo de consola `--crear-admin` y restaura las variables temporales al
+terminar. No publica un endpoint anónimo para crear administradores. Una segunda
+inicialización se rechaza cuando ya existe una asignación al rol administrador.
+Las altas posteriores se realizan desde la API o el frontend con permisos.
+
+### Preparar la operación desde el frontend
+
+1. Inicia sesión con el administrador; configura sedes, áreas, equipos, políticas
+   de atención y servicios activos.
+2. Crea usuarios, asígnales un área y sus roles; incorpora los técnicos a su
+   equipo. Las asignaciones requieren integrantes activos y disponibles, con
+   permiso para atender tickets.
+3. El registro público asigna solamente el rol empleado. La administración de
+   usuarios y roles permanece protegida.
+4. `GET /api/Auth/sesion` devuelve roles y permisos vigentes para la navegación.
+   La API vuelve a comprobar permisos y estado del usuario en cada JWT recibido.
+5. El solicitante crea un ticket; el coordinador asigna un técnico; el técnico
+   inicia y resuelve la atención; el solicitante confirma el cierre. Las acciones
+   usan la versión vigente del ticket para detectar actualizaciones concurrentes.
+
+Los endpoints `GET /api/IntegrantesEquipo/personas` y
+`GET /api/Tickets/{id}/tecnicos-disponibles` proporcionan las opciones autorizadas
+para los formularios. Las notificaciones del ciclo de tickets respetan las
+preferencias y no publican comentarios internos al solicitante. Los adjuntos
+de esta entrega almacenan metadatos; todavía no suben ni descargan archivos físicos.

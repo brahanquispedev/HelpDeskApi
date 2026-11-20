@@ -13,6 +13,13 @@ namespace HelpDesk.Api.Controllers;
 [Authorize]
 public class IntegrantesEquipoController(ISender sender) : ControllerBase
 {
+    [HttpGet("personas")]
+    public async Task<IActionResult> ListarPersonas(CancellationToken ct)
+    {
+        var result = await sender.Send(new ListarPersonasParaEquipoQuery(), ct);
+        return StatusCode(result.StatusCode, result);
+    }
+
     [HttpGet]
     [ProducesResponseType(typeof(ResponseDto<IEnumerable<IntegrantesEquipoResponseDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Listar([FromQuery] Guid? idEquipo, [FromQuery] bool? soloActivos, CancellationToken ct)

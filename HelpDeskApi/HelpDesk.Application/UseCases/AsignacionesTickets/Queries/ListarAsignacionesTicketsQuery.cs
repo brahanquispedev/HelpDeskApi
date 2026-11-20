@@ -37,6 +37,8 @@ internal sealed class ListarAsignacionesTicketsQueryHandler(IUnitOfWork _unitOfW
                 IdTicket = entity.IdTicket,
                 IdEquipo = entity.IdEquipo,
                 IdTecnico = entity.IdTecnico,
+                NombreEquipo = entity.IdEquipoNavigation.Nombre,
+                NombreTecnico = entity.IdTecnicoNavigation == null ? null : entity.IdTecnicoNavigation.Nombres + " " + entity.IdTecnicoNavigation.Apellidos,
                 IdAsignador = entity.IdAsignador,
                 FechaAsignacion = entity.FechaAsignacion,
                 FechaFin = entity.FechaFin,

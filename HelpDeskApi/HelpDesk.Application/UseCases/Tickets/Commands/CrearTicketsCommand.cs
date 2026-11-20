@@ -3,6 +3,7 @@ using HelpDesk.Domain.Dtos.Common;
 using Microsoft.EntityFrameworkCore;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
+using HelpDesk.Application.Services;
 using HelpDesk.Domain.Dtos.Tickets;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
@@ -28,7 +29,7 @@ public class CrearTicketsCommand : IRequest<ResponseDto<TicketsResponseDto>>
     public int? Version { get; set; }
 }
 
-internal sealed class CrearTicketsCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor) : IRequestHandler<CrearTicketsCommand, ResponseDto<TicketsResponseDto>>
+internal sealed class CrearTicketsCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor, TicketNotifications notices) : IRequestHandler<CrearTicketsCommand, ResponseDto<TicketsResponseDto>>
 {
     public async Task<ResponseDto<TicketsResponseDto>> Handle(CrearTicketsCommand request, CancellationToken ct)
     {
@@ -52,8 +53,12 @@ internal sealed class CrearTicketsCommandHandler(IUnitOfWork _unitOfWork, Access
             };
             var user = await Required<global::HelpDesk.Domain.Models.Usuarios>(actor.Id);
             Validation.Require(user.IdArea.HasValue, "Asigne un area al usuario antes de crear tickets.");
+            Validation.Require((await Required<global::HelpDesk.Domain.Models.Areas>(user.IdArea!.Value)).Activo,
+                "El area del usuario esta inactiva. Asigne un area activa antes de crear tickets.");
             var service = await Required<global::HelpDesk.Domain.Models.Servicios>(entity.IdServicio);
             Validation.Require(service.Activo, "El servicio esta inactivo.");
+            Validation.Require((await Required<global::HelpDesk.Domain.Models.EquiposSoporte>(service.IdEquipoResponsable)).Activo,
+                "El equipo responsable del servicio esta inactivo.");
             var policy = (await (_unitOfWork.Repository<global::HelpDesk.Domain.Models.PoliticasAtencion>().Query().Where(x => x.Prioridad == entity.Prioridad && x.Activo)).ToListAsync()).SingleOrDefault()
             ?? throw new BusinessException(400, "Configure una politica activa para esta prioridad.");
             entity.IdSolicitante = actor.Id;
@@ -102,6 +107,7 @@ internal sealed class CrearTicketsCommandHandler(IUnitOfWork _unitOfWork, Access
 
                 Fecha = DateTime.UtcNow
             });
+            await notices.NotifyCoordinatorsAsync(entity, ct);
             await _unitOfWork.Complete();
             return new ResponseDto<TicketsResponseDto>(201, new TicketsResponseDto
             {
