@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
@@ -32,7 +32,7 @@ internal sealed class ActualizarEquiposSoporteCommandHandler(IUnitOfWork _unitOf
         try
         {
             Validation.Check(request);
-            if (!access.Admin) access.Permission("equipos_soporte.actualizar");
+            if (!access.Admin) access.Permission("organizacion.administrar");
 
             var repo = _unitOfWork.Repository<Domain.Models.EquiposSoporte>();
             var entity = await repo.GetByIdAsync([request.IdEquipo]);

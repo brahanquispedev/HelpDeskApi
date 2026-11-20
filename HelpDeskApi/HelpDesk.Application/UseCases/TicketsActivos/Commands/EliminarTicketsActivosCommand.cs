@@ -7,7 +7,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.TicketsActivos;
+namespace HelpDesk.Application.UseCases.TicketsActivos.Commands;
 
 public class EliminarTicketsActivosCommand : IRequest<ResponseDto<OperacionDto>>
 {

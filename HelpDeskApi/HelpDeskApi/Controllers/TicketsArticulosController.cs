@@ -1,4 +1,5 @@
-using HelpDesk.Application.UseCases.TicketsArticulos;
+using HelpDesk.Application.UseCases.TicketsArticulos.Commands;
+using HelpDesk.Application.UseCases.TicketsArticulos.Queries;
 using HelpDesk.Domain.Dtos.TicketsArticulos;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

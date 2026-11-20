@@ -8,7 +8,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.CategoriasConocimiento;
+namespace HelpDesk.Application.UseCases.CategoriasConocimiento.Commands;
 
 public class ActualizarCategoriasConocimientoCommand : IRequest<ResponseDto<CategoriasConocimientoResponseDto>>
 {

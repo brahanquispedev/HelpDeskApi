@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Areas;
@@ -30,7 +30,7 @@ internal sealed class ActualizarAreasCommandHandler(IUnitOfWork _unitOfWork, Acc
         try
         {
             Validation.Check(request);
-            if (!access.Admin) access.Permission("areas.actualizar");
+            if (!access.Admin) access.Permission("organizacion.administrar");
 
             var repo = _unitOfWork.Repository<Domain.Models.Areas>();
             var entity = await repo.GetByIdAsync([request.IdArea]);

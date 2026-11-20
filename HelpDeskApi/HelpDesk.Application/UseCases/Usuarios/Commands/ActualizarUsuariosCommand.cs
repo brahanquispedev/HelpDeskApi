@@ -9,7 +9,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.Usuarios;
+namespace HelpDesk.Application.UseCases.Usuarios.Commands;
 
 public class ActualizarUsuariosCommand : IRequest<ResponseDto<UsuariosResponseDto>>
 {
@@ -43,6 +43,12 @@ internal sealed class ActualizarUsuariosCommandHandler(IUnitOfWork _unitOfWork, 
 
             Validation.Check(request);
             Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            if (request.IdArea is Guid idArea)
+            {
+                var area = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Areas>().GetByIdAsync([idArea])
+                    ?? throw new BusinessException(400, "El area no existe.");
+                Validation.Require(area.Activo, "El area esta inactiva.");
+            }
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().GetByIdAsync(request.Keys)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);

@@ -6,7 +6,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.Cambios;
+namespace HelpDesk.Application.UseCases.Cambios.Queries;
 
 public class ObtenerCambiosQuery : IRequest<ResponseDto<CambiosResponseDto>>
 {

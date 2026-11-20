@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.Notificaciones;
 using HelpDesk.Domain.Exceptions;
@@ -32,7 +32,7 @@ internal sealed class ObtenerNotificacionesQueryHandler(IUnitOfWork _unitOfWork,
 
             if (!access.Admin && notificacion.IdUsuario != actor.Id)
             {
-                access.Permission("notificaciones.obtener");
+                access.Permission("usuarios.administrar");
             }
 
             var dto = new NotificacionesResponseDto

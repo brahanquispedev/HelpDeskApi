@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.Notificaciones;
 using HelpDesk.Domain.Exceptions;
@@ -24,7 +24,7 @@ internal sealed class ListarNotificacionesQueryHandler(IUnitOfWork _unitOfWork, 
             var targetUserId = request.IdUsuario ?? actor.Id;
             if (!access.Admin && targetUserId != actor.Id)
             {
-                access.Permission("notificaciones.listar");
+                access.Permission("usuarios.administrar");
             }
 
             var query = _unitOfWork.Repository<Domain.Models.Notificaciones>().Query()

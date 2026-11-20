@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Common;
+using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.IntegrantesEquipo;
@@ -25,7 +25,7 @@ internal sealed class ActualizarIntegrantesEquipoCommandHandler(IUnitOfWork _uni
         try
         {
             Validation.Check(request);
-            if (!access.Admin) access.Permission("integrantes_equipo.actualizar");
+            if (!access.Admin) access.Permission("organizacion.administrar");
 
             var repo = _unitOfWork.Repository<Domain.Models.IntegrantesEquipo>();
             var entity = await repo.GetByIdAsync([request.IdEquipo, request.IdUsuario]);

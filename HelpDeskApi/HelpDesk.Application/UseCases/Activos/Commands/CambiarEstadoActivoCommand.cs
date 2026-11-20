@@ -42,7 +42,7 @@ internal sealed class CambiarEstadoActivoCommandHandler(IUnitOfWork _unitOfWork,
 
             if (estado == "baja")
             {
-                var tieneAsignacionVigente = await _unitOfWork.Repository<AsignacionesActivos>().Query()
+                var tieneAsignacionVigente = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesActivos>().Query()
                     .AnyAsync(x => x.IdActivo == entity.IdActivo && x.FechaDevolucion == null, ct);
                 Validation.Require(!tieneAsignacionVigente,
                     "No se puede dar de baja un activo con asignacion vigente.", 409);

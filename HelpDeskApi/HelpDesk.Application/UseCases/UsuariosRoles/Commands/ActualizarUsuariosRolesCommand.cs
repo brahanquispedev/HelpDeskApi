@@ -8,7 +8,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.UsuariosRoles;
+namespace HelpDesk.Application.UseCases.UsuariosRoles.Commands;
 
 public class ActualizarUsuariosRolesCommand : IRequest<ResponseDto<UsuariosRolesResponseDto>>
 {

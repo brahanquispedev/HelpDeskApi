@@ -7,7 +7,7 @@ using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
 
-namespace HelpDesk.Application.UseCases.Permisos;
+namespace HelpDesk.Application.UseCases.Permisos.Queries;
 
 public class ObtenerPermisosQuery : IRequest<ResponseDto<PermisosResponseDto>>
 {

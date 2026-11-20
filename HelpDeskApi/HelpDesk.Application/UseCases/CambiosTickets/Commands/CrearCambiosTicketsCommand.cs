@@ -7,7 +7,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.CambiosTickets;
+namespace HelpDesk.Application.UseCases.CambiosTickets.Commands;
 
 public class CrearCambiosTicketsCommand : IRequest<ResponseDto<CambiosTicketsResponseDto>>
 {

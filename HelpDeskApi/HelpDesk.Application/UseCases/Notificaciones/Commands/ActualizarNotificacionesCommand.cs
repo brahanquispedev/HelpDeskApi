@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
@@ -38,7 +38,7 @@ internal sealed class ActualizarNotificacionesCommandHandler(IUnitOfWork _unitOf
         try
         {
             Validation.Check(request);
-            if (!access.Admin) access.Permission("notificaciones.actualizar");
+            if (!access.Admin) access.Permission("usuarios.administrar");
 
             var repo = _unitOfWork.Repository<Domain.Models.Notificaciones>();
             var entity = await repo.GetByIdAsync([request.IdNotificacion]);

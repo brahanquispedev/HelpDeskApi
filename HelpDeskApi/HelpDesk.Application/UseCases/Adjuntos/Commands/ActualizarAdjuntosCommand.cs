@@ -8,7 +8,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.Adjuntos;
+namespace HelpDesk.Application.UseCases.Adjuntos.Commands;
 
 public class ActualizarAdjuntosCommand : IRequest<ResponseDto<AdjuntosResponseDto>>
 {
@@ -18,11 +18,12 @@ public class ActualizarAdjuntosCommand : IRequest<ResponseDto<AdjuntosResponseDt
     public Guid IdTicket { get; set; }
     public Guid? IdComentario { get; set; }
     [Required]
-    [StringLength(10000)]
+    [StringLength(255)]
     public string NombreArchivo { get; set; } = "";
     [Required]
-    [StringLength(10000)]
+    [StringLength(150)]
     public string TipoArchivo { get; set; } = "";
+    [Range(1, long.MaxValue)]
     public long TamanoBytes { get; set; }
     public bool EsInterno { get; set; }
 }
@@ -53,7 +54,7 @@ internal sealed class ActualizarAdjuntosCommandHandler(IUnitOfWork _unitOfWork, 
             if (entity.IdComentario is Guid commentId)
             {
                 var parent = await Required<global::HelpDesk.Domain.Models.Comentarios>(commentId);
-                Validation.Require(parent.IdTicket == entity.IdTicket, "El comentario pertenece entity otro ticket.");
+                Validation.Require(parent.IdTicket == entity.IdTicket, "El comentario pertenece a otro ticket.");
                 if (parent.EsInterno) entity.EsInterno = true;
             }
 

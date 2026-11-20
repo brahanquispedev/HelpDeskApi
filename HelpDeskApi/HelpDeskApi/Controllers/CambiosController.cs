@@ -1,4 +1,5 @@
-using HelpDesk.Application.UseCases.Cambios;
+using HelpDesk.Application.UseCases.Cambios.Commands;
+using HelpDesk.Application.UseCases.Cambios.Queries;
 using HelpDesk.Domain.Dtos.Cambios;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

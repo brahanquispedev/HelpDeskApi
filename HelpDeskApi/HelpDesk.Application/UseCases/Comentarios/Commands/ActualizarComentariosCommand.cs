@@ -8,7 +8,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.Comentarios;
+namespace HelpDesk.Application.UseCases.Comentarios.Commands;
 
 public class ActualizarComentariosCommand : IRequest<ResponseDto<ComentariosResponseDto>>
 {

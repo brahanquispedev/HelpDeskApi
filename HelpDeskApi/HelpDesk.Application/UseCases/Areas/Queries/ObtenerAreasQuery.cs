@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Areas;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Exceptions;
@@ -24,13 +24,15 @@ internal sealed class ObtenerAreasQueryHandler(IUnitOfWork _unitOfWork, AccessRu
     {
         try
         {
-            if (!access.Admin) access.Permission("areas.obtener");
+
 
             var area = await _unitOfWork.Repository<Domain.Models.Areas>().GetByIdAsync([request.IdArea]);
             if (area == null)
             {
                 throw new BusinessException(404, "Area no encontrada.");
             }
+
+            access.EnsureRead(area);
 
             var dto = new AreasResponseDto
             {

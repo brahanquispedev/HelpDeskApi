@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.EnviosNotificaciones;
 using HelpDesk.Domain.Exceptions;
@@ -21,7 +21,7 @@ internal sealed class ListarEnviosNotificacionesQueryHandler(IUnitOfWork _unitOf
     {
         try
         {
-            if (!access.Admin) access.Permission("envios_notificaciones.listar");
+            if (!access.Admin) access.Permission("usuarios.administrar");
 
             var query = _unitOfWork.Repository<Domain.Models.EnviosNotificaciones>().Query();
 

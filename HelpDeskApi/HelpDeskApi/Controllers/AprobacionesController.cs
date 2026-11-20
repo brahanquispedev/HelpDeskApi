@@ -1,4 +1,5 @@
-using HelpDesk.Application.UseCases.Aprobaciones;
+using HelpDesk.Application.UseCases.Aprobaciones.Commands;
+using HelpDesk.Application.UseCases.Aprobaciones.Queries;
 using HelpDesk.Domain.Dtos.Aprobaciones;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

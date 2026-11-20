@@ -1,4 +1,4 @@
-using HelpDesk.Application.UseCases.Auditoria;
+using HelpDesk.Application.UseCases.Auditoria.Queries;
 using HelpDesk.Domain.Dtos.Auditoria;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

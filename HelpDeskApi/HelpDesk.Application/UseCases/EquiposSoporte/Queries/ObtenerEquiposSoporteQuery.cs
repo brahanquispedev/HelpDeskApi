@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.EquiposSoporte;
 using HelpDesk.Domain.Exceptions;
@@ -24,13 +24,15 @@ internal sealed class ObtenerEquiposSoporteQueryHandler(IUnitOfWork _unitOfWork,
     {
         try
         {
-            if (!access.Admin) access.Permission("equipos_soporte.obtener");
+
 
             var equipo = await _unitOfWork.Repository<Domain.Models.EquiposSoporte>().GetByIdAsync([request.IdEquipo]);
             if (equipo == null)
             {
                 throw new BusinessException(404, "Equipo de soporte no encontrado.");
             }
+
+            access.EnsureRead(equipo);
 
             var dto = new EquiposSoporteResponseDto
             {

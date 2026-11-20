@@ -8,7 +8,7 @@ using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
 
-namespace HelpDesk.Application.UseCases.Permisos;
+namespace HelpDesk.Application.UseCases.Permisos.Commands;
 
 public class CrearPermisosCommand : IRequest<ResponseDto<PermisosResponseDto>>
 {

@@ -6,7 +6,7 @@ using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-namespace HelpDesk.Application.UseCases.Autenticacion;
+namespace HelpDesk.Application.UseCases.Autenticacion.Commands;
 
 public sealed class RegistrarUsuarioCommand : RegistroDto, IRequest<ResponseDto<UsuarioRegistradoDto>>
 {
@@ -24,10 +24,14 @@ internal sealed class RegistrarUsuarioCommandHandler(IUnitOfWork _unitOfWork, IP
             var correo = request.Correo.Trim().ToLowerInvariant();
 
             var existe = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().Query()
-                .AnyAsync(u => u.NombreUsuario == nombreUsuario || u.Correo == correo, ct);
+                .AnyAsync(u => u.NombreUsuario.ToLower() == nombreUsuario.ToLower() || u.Correo == correo, ct);
             Validation.Require(!existe, "El nombre de usuario o el correo ya estan registrados.", 409);
 
-            var usuario = new Domain.Models.Usuarios
+            var rolEmpleado = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().Query()
+                .SingleOrDefaultAsync(r => r.Nombre == "empleado");
+            Validation.Require(rolEmpleado is not null, "Falta el rol empleado del catalogo inicial.", 409);
+
+            var usuario = new global::HelpDesk.Domain.Models.Usuarios
             {
                 IdUsuario = Guid.NewGuid(),
                 Nombres = request.Nombres.Trim(),
@@ -40,6 +44,12 @@ internal sealed class RegistrarUsuarioCommandHandler(IUnitOfWork _unitOfWork, IP
             };
 
             await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().AddAsync(usuario);
+            await _unitOfWork.Repository<global::HelpDesk.Domain.Models.UsuariosRoles>().AddAsync(new global::HelpDesk.Domain.Models.UsuariosRoles
+            {
+                IdUsuario = usuario.IdUsuario,
+                IdRol = rolEmpleado!.IdRol,
+                FechaAsignacion = DateTime.UtcNow
+            });
             await _unitOfWork.Complete();
 
             return new ResponseDto<UsuarioRegistradoDto>(

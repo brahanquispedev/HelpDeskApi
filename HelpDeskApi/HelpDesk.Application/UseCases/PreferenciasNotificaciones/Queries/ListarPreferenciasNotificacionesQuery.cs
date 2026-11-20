@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.PreferenciasNotificaciones;
 using HelpDesk.Domain.Exceptions;
@@ -23,7 +23,7 @@ internal sealed class ListarPreferenciasNotificacionesQueryHandler(IUnitOfWork _
             var targetUserId = request.IdUsuario ?? actor.Id;
             if (!access.Admin && targetUserId != actor.Id)
             {
-                access.Permission("preferencias_notificaciones.listar");
+                access.Permission("usuarios.administrar");
             }
 
             var items = await _unitOfWork.Repository<Domain.Models.PreferenciasNotificaciones>().Query()

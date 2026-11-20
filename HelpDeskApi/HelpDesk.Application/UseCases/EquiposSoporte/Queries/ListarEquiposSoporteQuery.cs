@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.EquiposSoporte;
 using HelpDesk.Domain.Exceptions;
@@ -20,9 +20,10 @@ internal sealed class ListarEquiposSoporteQueryHandler(IUnitOfWork _unitOfWork, 
     {
         try
         {
-            if (!access.Admin) access.Permission("equipos_soporte.listar");
+
 
             var query = _unitOfWork.Repository<Domain.Models.EquiposSoporte>().Query();
+            query = access.Scope(query);
 
             if (request.SoloActivos.HasValue && request.SoloActivos.Value)
             {

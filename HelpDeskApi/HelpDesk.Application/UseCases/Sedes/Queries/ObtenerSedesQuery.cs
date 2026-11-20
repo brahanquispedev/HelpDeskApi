@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.Sedes;
 using HelpDesk.Domain.Exceptions;
@@ -24,13 +24,15 @@ internal sealed class ObtenerSedesQueryHandler(IUnitOfWork _unitOfWork, AccessRu
     {
         try
         {
-            if (!access.Admin) access.Permission("sedes.obtener");
+
 
             var sede = await _unitOfWork.Repository<Domain.Models.Sedes>().GetByIdAsync([request.IdSede]);
             if (sede == null)
             {
                 throw new BusinessException(404, "Sede no encontrada.");
             }
+
+            access.EnsureRead(sede);
 
             var dto = new SedesResponseDto
             {

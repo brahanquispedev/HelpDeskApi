@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Ports;
@@ -32,7 +32,7 @@ internal sealed class MarcarNotificacionLeidaCommandHandler(IUnitOfWork _unitOfW
 
             if (!access.Admin && entity.IdUsuario != actor.Id)
             {
-                access.Permission("notificaciones.marcar_leida");
+                access.Permission("usuarios.administrar");
             }
 
             if (!entity.FechaLectura.HasValue)

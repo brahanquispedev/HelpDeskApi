@@ -8,7 +8,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.Tickets;
+namespace HelpDesk.Application.UseCases.Tickets.Commands;
 
 public class CrearTicketsCommand : IRequest<ResponseDto<TicketsResponseDto>>
 {

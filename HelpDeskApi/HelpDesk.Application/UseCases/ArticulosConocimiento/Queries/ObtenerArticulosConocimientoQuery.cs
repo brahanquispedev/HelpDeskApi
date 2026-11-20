@@ -6,7 +6,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.ArticulosConocimiento;
+namespace HelpDesk.Application.UseCases.ArticulosConocimiento.Queries;
 
 public class ObtenerArticulosConocimientoQuery : IRequest<ResponseDto<ArticulosConocimientoResponseDto>>
 {

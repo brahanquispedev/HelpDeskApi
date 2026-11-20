@@ -1,4 +1,5 @@
-using HelpDesk.Application.UseCases.Usuarios;
+using HelpDesk.Application.UseCases.Usuarios.Commands;
+using HelpDesk.Application.UseCases.Usuarios.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

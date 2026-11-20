@@ -7,7 +7,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.UsuariosRoles;
+namespace HelpDesk.Application.UseCases.UsuariosRoles.Queries;
 
 public class ListarUsuariosRolesQuery : IRequest<ResponseDto<PaginaDto<UsuariosRolesResponseDto>>>
 {

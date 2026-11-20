@@ -7,7 +7,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.TiposActivos;
+namespace HelpDesk.Application.UseCases.TiposActivos.Queries;
 
 public class ListarTiposActivosQuery : IRequest<ResponseDto<PaginaDto<TiposActivosResponseDto>>>
 {

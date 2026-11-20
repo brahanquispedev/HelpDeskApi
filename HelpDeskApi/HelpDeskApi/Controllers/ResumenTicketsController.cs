@@ -1,4 +1,4 @@
-using HelpDesk.Application.UseCases.ResumenTickets;
+using HelpDesk.Application.UseCases.ResumenTickets.Queries;
 using HelpDesk.Domain.Dtos.ResumenTickets;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

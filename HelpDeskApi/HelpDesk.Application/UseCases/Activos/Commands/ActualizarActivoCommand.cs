@@ -57,18 +57,18 @@ internal sealed class ActualizarActivoCommandHandler(IUnitOfWork _unitOfWork, Ac
                 .AnyAsync(x => x.IdActivo != request.IdActivo && x.CodigoPatrimonial.ToLower() == codigo.ToLower(), ct);
             Validation.Require(!existeCodigo, "Ya existe otro activo con ese codigo patrimonial.", 409);
 
-            var sede = await _unitOfWork.Repository<Sedes>().GetByIdAsync([request.IdSede])
+            var sede = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Sedes>().GetByIdAsync([request.IdSede])
                 ?? throw new BusinessException(400, "Sede no encontrada.");
             Validation.Require(sede.Activo, "La sede esta inactiva.");
 
-            var tipo = await _unitOfWork.Repository<TiposActivos>().GetByIdAsync([request.IdTipoActivo])
+            var tipo = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.TiposActivos>().GetByIdAsync([request.IdTipoActivo])
                 ?? throw new BusinessException(400, "Tipo de activo no encontrado.");
             Validation.Require(tipo.Activo, "El tipo de activo esta inactivo.");
 
             if (request.IdArea.HasValue)
             {
                 Validation.Require(request.IdArea.Value != Guid.Empty, "IdArea no es valido.");
-                var area = await _unitOfWork.Repository<Areas>().GetByIdAsync([request.IdArea.Value])
+                var area = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Areas>().GetByIdAsync([request.IdArea.Value])
                     ?? throw new BusinessException(400, "Area no encontrada.");
                 Validation.Require(area.Activo && area.IdSede == request.IdSede,
                     "El area no pertenece a la sede o esta inactiva.");

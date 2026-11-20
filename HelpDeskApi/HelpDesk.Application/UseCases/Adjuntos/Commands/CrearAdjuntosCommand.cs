@@ -7,18 +7,19 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.Adjuntos;
+namespace HelpDesk.Application.UseCases.Adjuntos.Commands;
 
 public class CrearAdjuntosCommand : IRequest<ResponseDto<AdjuntosResponseDto>>
 {
     public Guid IdTicket { get; set; }
     public Guid? IdComentario { get; set; }
     [Required]
-    [StringLength(10000)]
+    [StringLength(255)]
     public string NombreArchivo { get; set; } = "";
     [Required]
-    [StringLength(10000)]
+    [StringLength(150)]
     public string TipoArchivo { get; set; } = "";
+    [Range(1, long.MaxValue)]
     public long TamanoBytes { get; set; }
     public bool EsInterno { get; set; }
 }
@@ -44,13 +45,15 @@ internal sealed class CrearAdjuntosCommandHandler(IUnitOfWork _unitOfWork, Acces
                 Fecha = DateTime.UtcNow
             };
             var attachedTicket = await Required<global::HelpDesk.Domain.Models.Tickets>(entity.IdTicket);
+            // Primera version: solo metadatos. Esta referencia no representa un archivo subido.
+            entity.UbicacionArchivo = $"metadatos/{entity.IdAdjunto:N}";
             access.EnsureRead(attachedTicket);
             if (entity.EsInterno) access.Permission("comentarios.internos");
             entity.IdUsuario = actor.Id;
             if (entity.IdComentario is Guid commentId)
             {
                 var parent = await Required<global::HelpDesk.Domain.Models.Comentarios>(commentId);
-                Validation.Require(parent.IdTicket == entity.IdTicket, "El comentario pertenece entity otro ticket.");
+                Validation.Require(parent.IdTicket == entity.IdTicket, "El comentario pertenece a otro ticket.");
                 if (parent.EsInterno) entity.EsInterno = true;
             }
 

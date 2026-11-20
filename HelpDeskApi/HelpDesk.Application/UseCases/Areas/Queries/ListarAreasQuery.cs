@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Areas;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Exceptions;
@@ -21,9 +21,10 @@ internal sealed class ListarAreasQueryHandler(IUnitOfWork _unitOfWork, AccessRul
     {
         try
         {
-            if (!access.Admin) access.Permission("areas.listar");
+
 
             var query = _unitOfWork.Repository<Domain.Models.Areas>().Query();
+            query = access.Scope(query);
 
             if (request.IdSede.HasValue)
             {

@@ -9,7 +9,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.Activos;
+namespace HelpDesk.Application.UseCases.Activos.Commands;
 
 public class ActualizarActivosCommand : IRequest<ResponseDto<ActivosResponseDto>>
 {

@@ -8,7 +8,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.TicketsArticulos;
+namespace HelpDesk.Application.UseCases.TicketsArticulos.Commands;
 
 public class ActualizarTicketsArticulosCommand : IRequest<ResponseDto<TicketsArticulosResponseDto>>
 {

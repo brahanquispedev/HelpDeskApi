@@ -6,7 +6,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.TicketsArticulos;
+namespace HelpDesk.Application.UseCases.TicketsArticulos.Queries;
 
 public class ObtenerTicketsArticulosQuery : IRequest<ResponseDto<TicketsArticulosResponseDto>>
 {

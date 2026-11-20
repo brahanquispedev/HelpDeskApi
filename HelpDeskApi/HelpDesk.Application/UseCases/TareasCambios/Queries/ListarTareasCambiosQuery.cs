@@ -7,7 +7,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.TareasCambios;
+namespace HelpDesk.Application.UseCases.TareasCambios.Queries;
 
 public class ListarTareasCambiosQuery : IRequest<ResponseDto<PaginaDto<TareasCambiosResponseDto>>>
 {

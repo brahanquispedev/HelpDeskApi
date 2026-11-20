@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Ports;
@@ -27,7 +27,7 @@ internal sealed class EliminarPreferenciasNotificacionesCommandHandler(IUnitOfWo
         {
             if (!access.Admin && request.IdUsuario != actor.Id)
             {
-                access.Permission("preferencias_notificaciones.eliminar");
+                access.Permission("usuarios.administrar");
             }
 
             var repo = _unitOfWork.Repository<Domain.Models.PreferenciasNotificaciones>();

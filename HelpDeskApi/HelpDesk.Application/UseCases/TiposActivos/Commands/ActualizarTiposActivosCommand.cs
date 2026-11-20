@@ -8,7 +8,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.TiposActivos;
+namespace HelpDesk.Application.UseCases.TiposActivos.Commands;
 
 public class ActualizarTiposActivosCommand : IRequest<ResponseDto<TiposActivosResponseDto>>
 {

@@ -1,4 +1,5 @@
-using HelpDesk.Application.UseCases.AsignacionesActivos;
+using HelpDesk.Application.UseCases.AsignacionesActivos.Commands;
+using HelpDesk.Application.UseCases.AsignacionesActivos.Queries;
 using HelpDesk.Domain.Dtos.AsignacionesActivos;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

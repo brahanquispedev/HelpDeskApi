@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Common;
+using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.IntegrantesEquipo;
@@ -23,7 +23,7 @@ internal sealed class CrearIntegrantesEquipoCommandHandler(IUnitOfWork _unitOfWo
         try
         {
             Validation.Check(request);
-            if (!access.Admin) access.Permission("integrantes_equipo.crear");
+            if (!access.Admin) access.Permission("organizacion.administrar");
 
             var equipo = await _unitOfWork.Repository<Domain.Models.EquiposSoporte>().GetByIdAsync([request.IdEquipo]);
             Validation.Require(equipo != null, "El equipo de soporte no existe.");

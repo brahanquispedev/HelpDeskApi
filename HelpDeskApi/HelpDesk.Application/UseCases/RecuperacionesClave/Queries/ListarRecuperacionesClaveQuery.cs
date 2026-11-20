@@ -1,7 +1,7 @@
+using HelpDesk.Domain.Dtos.RecuperacionesClave;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Domain.Dtos.RecuperacionesClaveResponseDto;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Ports;
 using MediatR;

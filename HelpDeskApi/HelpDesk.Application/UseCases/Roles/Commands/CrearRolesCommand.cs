@@ -1,8 +1,8 @@
+using HelpDesk.Domain.Dtos.Roles;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Domain.Dtos.Role;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Ports;
 using MediatR;

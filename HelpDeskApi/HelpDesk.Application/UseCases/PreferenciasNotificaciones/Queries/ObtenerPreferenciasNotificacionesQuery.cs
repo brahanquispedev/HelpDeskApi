@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.PreferenciasNotificaciones;
 using HelpDesk.Domain.Exceptions;
@@ -28,7 +28,7 @@ internal sealed class ObtenerPreferenciasNotificacionesQueryHandler(IUnitOfWork 
         {
             if (!access.Admin && request.IdUsuario != actor.Id)
             {
-                access.Permission("preferencias_notificaciones.obtener");
+                access.Permission("usuarios.administrar");
             }
 
             var pref = await _unitOfWork.Repository<Domain.Models.PreferenciasNotificaciones>().GetByIdAsync([request.IdUsuario, request.TipoEvento]);

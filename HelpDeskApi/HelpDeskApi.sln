@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelpDesk.Api", "HelpDesk.Api\HelpDesk.Api.csproj", "{C6134586-CB36-4D35-8422-3DA286DDB970}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelpDeskApi", "HelpDeskApi\HelpDeskApi.csproj", "{C6134586-CB36-4D35-8422-3DA286DDB970}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelpDesk.Application", "HelpDesk.Application\HelpDesk.Application.csproj", "{AF05D342-A5F9-49DE-83BD-D78BAFADC1D8}"
 EndProject

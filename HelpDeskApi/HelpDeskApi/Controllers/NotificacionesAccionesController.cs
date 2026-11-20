@@ -4,7 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HelpDeskApi.Controllers;
+namespace HelpDesk.Api.Controllers;
 
 [ApiController]
 [Route("api/notificaciones")]

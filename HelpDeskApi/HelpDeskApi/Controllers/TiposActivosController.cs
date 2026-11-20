@@ -1,4 +1,5 @@
-using HelpDesk.Application.UseCases.TiposActivos;
+using HelpDesk.Application.UseCases.TiposActivos.Commands;
+using HelpDesk.Application.UseCases.TiposActivos.Queries;
 using HelpDesk.Domain.Dtos.TiposActivos;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.IntegrantesEquipo;
 using HelpDesk.Domain.Exceptions;
@@ -21,7 +21,7 @@ internal sealed class ListarIntegrantesEquipoQueryHandler(IUnitOfWork _unitOfWor
     {
         try
         {
-            if (!access.Admin) access.Permission("integrantes_equipo.listar");
+            if (!access.Admin) access.Permission("organizacion.administrar");
 
             var query = _unitOfWork.Repository<Domain.Models.IntegrantesEquipo>().Query();
 

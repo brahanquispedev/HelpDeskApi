@@ -7,7 +7,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.ProblemasTickets;
+namespace HelpDesk.Application.UseCases.ProblemasTickets.Commands;
 
 public class EliminarProblemasTicketsCommand : IRequest<ResponseDto<OperacionDto>>
 {

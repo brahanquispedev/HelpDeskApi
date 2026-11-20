@@ -6,7 +6,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.AsignacionesActivos;
+namespace HelpDesk.Application.UseCases.AsignacionesActivos.Queries;
 
 public class ObtenerAsignacionesActivosQuery : IRequest<ResponseDto<AsignacionesActivosResponseDto>>
 {

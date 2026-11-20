@@ -1,4 +1,5 @@
-using HelpDesk.Application.UseCases.Permisos;
+using HelpDesk.Application.UseCases.Permisos.Commands;
+using HelpDesk.Application.UseCases.Permisos.Queries;
 using HelpDesk.Domain.Dtos.Permisos;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

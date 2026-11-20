@@ -6,7 +6,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.CategoriasServicios;
+namespace HelpDesk.Application.UseCases.CategoriasServicios.Queries;
 
 public class ObtenerCategoriasServiciosQuery : IRequest<ResponseDto<CategoriasServiciosResponseDto>>
 {

@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Ports;
@@ -23,7 +23,7 @@ internal sealed class EliminarEquiposSoporteCommandHandler(IUnitOfWork _unitOfWo
     {
         try
         {
-            if (!access.Admin) access.Permission("equipos_soporte.eliminar");
+            if (!access.Admin) access.Permission("organizacion.administrar");
 
             var repo = _unitOfWork.Repository<Domain.Models.EquiposSoporte>();
             var entity = await repo.GetByIdAsync([request.IdEquipo]);

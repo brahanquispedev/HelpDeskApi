@@ -1,4 +1,4 @@
-namespace HelpDesk.Domain.Dtos.Role;
+namespace HelpDesk.Domain.Dtos.Roles;
 
 public class RolesResponseDto
 {

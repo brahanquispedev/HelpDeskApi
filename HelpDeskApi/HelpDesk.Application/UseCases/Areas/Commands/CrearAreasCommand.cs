@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Areas;
@@ -27,7 +27,7 @@ internal sealed class CrearAreasCommandHandler(IUnitOfWork _unitOfWork, AccessRu
         try
         {
             Validation.Check(request);
-            if (!access.Admin) access.Permission("areas.crear");
+            if (!access.Admin) access.Permission("organizacion.administrar");
 
             // Validar que la sede padre exista
             var sede = await _unitOfWork.Repository<Domain.Models.Sedes>().GetByIdAsync([request.IdSede]);

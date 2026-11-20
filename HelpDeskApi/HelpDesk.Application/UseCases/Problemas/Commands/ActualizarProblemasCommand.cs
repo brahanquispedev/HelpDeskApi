@@ -8,7 +8,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.Problemas;
+namespace HelpDesk.Application.UseCases.Problemas.Commands;
 
 public class ActualizarProblemasCommand : IRequest<ResponseDto<ProblemasResponseDto>>
 {

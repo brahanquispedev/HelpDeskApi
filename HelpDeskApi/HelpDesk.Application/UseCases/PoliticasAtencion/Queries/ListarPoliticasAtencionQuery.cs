@@ -7,7 +7,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.PoliticasAtencion;
+namespace HelpDesk.Application.UseCases.PoliticasAtencion.Queries;
 
 public class ListarPoliticasAtencionQuery : IRequest<ResponseDto<PaginaDto<PoliticasAtencionResponseDto>>>
 {

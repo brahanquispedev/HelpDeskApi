@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
@@ -31,7 +31,7 @@ internal sealed class CrearPreferenciasNotificacionesCommandHandler(IUnitOfWork 
             Validation.Check(request);
             if (!access.Admin && request.IdUsuario != actor.Id)
             {
-                access.Permission("preferencias_notificaciones.crear");
+                access.Permission("usuarios.administrar");
             }
 
             var usuario = await _unitOfWork.Repository<Domain.Models.Usuarios>().GetByIdAsync([request.IdUsuario]);

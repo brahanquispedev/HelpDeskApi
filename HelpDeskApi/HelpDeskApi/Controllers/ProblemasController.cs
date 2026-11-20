@@ -1,4 +1,5 @@
-using HelpDesk.Application.UseCases.Problemas;
+using HelpDesk.Application.UseCases.Problemas.Commands;
+using HelpDesk.Application.UseCases.Problemas.Queries;
 using HelpDesk.Domain.Dtos.Problemas;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

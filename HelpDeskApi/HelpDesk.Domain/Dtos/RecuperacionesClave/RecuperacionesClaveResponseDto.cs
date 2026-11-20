@@ -1,4 +1,4 @@
-namespace HelpDesk.Domain.Dtos.RecuperacionesClaveResponseDto;
+namespace HelpDesk.Domain.Dtos.RecuperacionesClave;
 
 public class RecuperacionesClaveResponseDto
 {

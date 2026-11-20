@@ -8,7 +8,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.UsuariosRoles;
+namespace HelpDesk.Application.UseCases.UsuariosRoles.Commands;
 
 public class EliminarUsuariosRolesCommand : IRequest<ResponseDto<OperacionDto>>
 {
@@ -26,7 +26,9 @@ internal sealed class EliminarUsuariosRolesCommandHandler(IUnitOfWork _unitOfWor
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.UsuariosRoles>().GetByIdAsync(request.Keys)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
-            await EnsureNotLastAdmin(entity.IdUsuario);
+            var esRolAdministrador = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().Query()
+                .AnyAsync(r => r.IdRol == entity.IdRol && r.Nombre == "administrador");
+            if (esRolAdministrador) await EnsureNotLastAdmin(entity.IdUsuario);
             _unitOfWork.Repository<global::HelpDesk.Domain.Models.UsuariosRoles>(null).Delete(entity);
             await _unitOfWork.Complete();
             return new ResponseDto<OperacionDto>(200, new OperacionDto(true), "Registro eliminado.");

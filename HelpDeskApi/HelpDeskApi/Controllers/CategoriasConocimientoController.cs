@@ -1,4 +1,5 @@
-using HelpDesk.Application.UseCases.CategoriasConocimiento;
+using HelpDesk.Application.UseCases.CategoriasConocimiento.Commands;
+using HelpDesk.Application.UseCases.CategoriasConocimiento.Queries;
 using HelpDesk.Domain.Dtos.CategoriasConocimiento;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

@@ -7,7 +7,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.Adjuntos;
+namespace HelpDesk.Application.UseCases.Adjuntos.Queries;
 
 public class ListarAdjuntosQuery : IRequest<ResponseDto<PaginaDto<AdjuntosResponseDto>>>
 {

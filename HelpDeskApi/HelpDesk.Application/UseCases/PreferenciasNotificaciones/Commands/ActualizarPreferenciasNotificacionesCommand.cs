@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
@@ -11,9 +12,11 @@ namespace HelpDesk.Application.UseCases.PreferenciasNotificaciones.Commands;
 
 public class ActualizarPreferenciasNotificacionesCommand : IRequest<ResponseDto<PreferenciasNotificacionesResponseDto>>
 {
+    [JsonIgnore]
     public Guid IdUsuario { get; set; }
 
-    [Required]
+    // Estas claves se reciben en la URL y el controlador las asigna antes del handler.
+    [JsonIgnore]
     [StringLength(50)]
     public string TipoEvento { get; set; } = "";
 
@@ -29,9 +32,10 @@ internal sealed class ActualizarPreferenciasNotificacionesCommandHandler(IUnitOf
         try
         {
             Validation.Check(request);
+            Validation.Require(!string.IsNullOrWhiteSpace(request.TipoEvento), "Indique el tipo de evento.");
             if (!access.Admin && request.IdUsuario != actor.Id)
             {
-                access.Permission("preferencias_notificaciones.actualizar");
+                access.Permission("usuarios.administrar");
             }
 
             var repo = _unitOfWork.Repository<Domain.Models.PreferenciasNotificaciones>();

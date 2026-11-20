@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
@@ -39,7 +39,7 @@ internal sealed class CrearNotificacionesCommandHandler(IUnitOfWork _unitOfWork,
         try
         {
             Validation.Check(request);
-            if (!access.Admin) access.Permission("notificaciones.crear");
+            if (!access.Admin) access.Permission("usuarios.administrar");
 
             var usuario = await _unitOfWork.Repository<Domain.Models.Usuarios>().GetByIdAsync([request.IdUsuario]);
             Validation.Require(usuario != null, "El usuario destinatario no existe.");

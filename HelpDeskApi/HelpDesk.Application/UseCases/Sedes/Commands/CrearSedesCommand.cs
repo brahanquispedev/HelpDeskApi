@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
@@ -28,7 +28,7 @@ internal sealed class CrearSedesCommandHandler(IUnitOfWork _unitOfWork, AccessRu
         try
         {
             Validation.Check(request);
-            if (!access.Admin) access.Permission("sedes.crear");
+            if (!access.Admin) access.Permission("organizacion.administrar");
 
             var repo = _unitOfWork.Repository<Domain.Models.Sedes>();
 

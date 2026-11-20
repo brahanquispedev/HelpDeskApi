@@ -10,7 +10,7 @@ using HelpDesk.Domain.Ports;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace HelpDesk.Application.UseCases.Autenticacion;
+namespace HelpDesk.Application.UseCases.Autenticacion.Commands;
 
 public sealed class IniciarSesionCommand : IRequest<ResponseDto<SesionDto>>
 {
@@ -36,7 +36,7 @@ internal sealed class IniciarSesionCommandHandler(
             var correo = nombreUsuario.ToLowerInvariant();
 
             var usuario = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().Query()
-                .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario || u.Correo.ToLower() == correo, ct);
+                .FirstOrDefaultAsync(u => u.NombreUsuario.ToLower() == correo || u.Correo == correo, ct);
 
             Validation.Require(usuario is not null, "Usuario o clave incorrectos.", 401);
             Validation.Require(usuario!.Activo, "Usuario inactivo.", 403);
@@ -47,7 +47,7 @@ internal sealed class IniciarSesionCommandHandler(
                 .Select(x => x.IdRol)
                 .ToListAsync(ct);
 
-            var roles = await _unitOfWork.Repository<Domain.Models.Roles>().Query()
+            var roles = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().Query()
                 .Where(r => roleIds.Contains(r.IdRol))
                 .Select(r => r.Nombre)
                 .ToListAsync(ct);

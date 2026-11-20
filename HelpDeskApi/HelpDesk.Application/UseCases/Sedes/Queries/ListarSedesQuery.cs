@@ -1,4 +1,4 @@
-﻿using HelpDesk.Application.Security;
+using HelpDesk.Application.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.Sedes;
 using HelpDesk.Domain.Exceptions;
@@ -20,9 +20,10 @@ internal sealed class ListarSedesQueryHandler(IUnitOfWork _unitOfWork, AccessRul
     {
         try
         {
-            if (!access.Admin) access.Permission("sedes.listar");
+
 
             var query = _unitOfWork.Repository<Domain.Models.Sedes>().Query();
+            query = access.Scope(query);
 
             if (request.SoloActivos.HasValue && request.SoloActivos.Value)
             {

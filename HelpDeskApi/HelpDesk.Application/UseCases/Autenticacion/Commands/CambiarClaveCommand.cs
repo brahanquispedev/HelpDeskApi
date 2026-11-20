@@ -7,7 +7,7 @@ using HelpDesk.Domain.Ports;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace HelpDesk.Application.UseCases.Autenticacion;
+namespace HelpDesk.Application.UseCases.Autenticacion.Commands;
 
 public sealed class CambiarClaveCommand : IRequest<ResponseDto<OperacionDto>>
 {

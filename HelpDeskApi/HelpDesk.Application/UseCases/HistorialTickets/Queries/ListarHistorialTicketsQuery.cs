@@ -7,7 +7,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.HistorialTickets;
+namespace HelpDesk.Application.UseCases.HistorialTickets.Queries;
 
 public class ListarHistorialTicketsQuery : IRequest<ResponseDto<PaginaDto<HistorialTicketsResponseDto>>>
 {

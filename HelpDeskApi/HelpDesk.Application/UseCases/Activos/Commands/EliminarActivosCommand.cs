@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Application.Common;
 using HelpDesk.Application.Security;
@@ -7,7 +8,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.Activos;
+namespace HelpDesk.Application.UseCases.Activos.Commands;
 
 public class EliminarActivosCommand : IRequest<ResponseDto<OperacionDto>>
 {
@@ -26,9 +27,13 @@ internal sealed class EliminarActivosCommandHandler(IUnitOfWork _unitOfWork, Acc
                          ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
 
-            _unitOfWork.Repository<global::HelpDesk.Domain.Models.Activos>(null).Delete(entity);
+            var asignado = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesActivos>().Query()
+                .AnyAsync(x => x.IdActivo == entity.IdActivo && x.FechaDevolucion == null);
+            Validation.Require(!asignado, "Devuelva el activo antes de darlo de baja.", 409);
+            Validation.Require(entity.Estado != "baja", "El activo ya esta dado de baja.", 409);
+            entity.Estado = "baja";
             await _unitOfWork.Complete();
-            return new ResponseDto<OperacionDto>(200, new OperacionDto(true), "Registro eliminado.");
+            return new ResponseDto<OperacionDto>(200, new OperacionDto(true), "Activo dado de baja.");
         }
         catch (BusinessException ex)
         {

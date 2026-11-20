@@ -7,7 +7,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
-namespace HelpDesk.Application.UseCases.Usuarios;
+namespace HelpDesk.Application.UseCases.Usuarios.Commands;
 
 public class CrearUsuariosCommand : IRequest<ResponseDto<UsuariosResponseDto>>
 {
@@ -38,6 +38,12 @@ internal sealed class CrearUsuariosCommandHandler(IUnitOfWork _unitOfWork, Acces
 
             Validation.Check(request);
             Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            if (request.IdArea is Guid idArea)
+            {
+                var area = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Areas>().GetByIdAsync([idArea])
+                    ?? throw new BusinessException(400, "El area no existe.");
+                Validation.Require(area.Activo, "El area esta inactiva.");
+            }
             var entity = new global::HelpDesk.Domain.Models.Usuarios()
             {
                 IdUsuario = Guid.NewGuid(),
