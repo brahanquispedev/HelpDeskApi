@@ -7,7 +7,12 @@ using HelpDesk.Domain.Ports;
 
 namespace HelpDesk.Application.Services;
 
-public sealed class AuthService(IUnitOfWork _unitOfWork, IPasswordService passwords)
+public interface IAuthService
+{
+    Task Bootstrap(RegistroDto input);
+}
+
+public sealed class AuthService(IUnitOfWork _unitOfWork, IPasswordService passwords) : IAuthService
 {
     public async Task Bootstrap(RegistroDto input)
     {
