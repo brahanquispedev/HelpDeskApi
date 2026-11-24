@@ -5,6 +5,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace HelpDesk.Application.UseCases.Permisos.Queries;
 
@@ -19,7 +20,10 @@ internal sealed class ObtenerPermisosQueryHandler(IUnitOfWork _unitOfWork, IAcce
     {
         try
         {
-            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Permisos>().GetByIdAsync(request.IdPermiso)
+            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Permisos>()
+                .Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.IdPermiso == request.IdPermiso)
                          ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
             return new ResponseDto<PermisosResponseDto>(200, new PermisosResponseDto

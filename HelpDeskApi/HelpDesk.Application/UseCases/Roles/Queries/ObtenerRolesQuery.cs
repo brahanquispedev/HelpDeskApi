@@ -4,6 +4,7 @@ using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Ports;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace HelpDesk.Application.UseCases.Roles.Queries;
 
@@ -18,7 +19,10 @@ internal sealed class ObtenerRolesQueryHandler(IUnitOfWork _unitOfWork, IAccessR
     {
         try
         {
-            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().GetByIdAsync(request.IdRol)
+            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>()
+                .Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.IdRol == request.IdRol)
                          ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
             return new ResponseDto<RolesResponseDto>(200, new RolesResponseDto
