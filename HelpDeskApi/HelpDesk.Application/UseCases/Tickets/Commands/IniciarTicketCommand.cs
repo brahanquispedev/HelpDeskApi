@@ -25,7 +25,7 @@ public class IniciarTicketCommand : IRequest<ResponseDto<TicketsResponseDto>>
     public Guid? IdTecnico { get; set; }
 }
 
-internal sealed class IniciarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurrentUser actor, AccessRules access, TicketNotifications notices)
+internal sealed class IniciarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurrentUser actor, IAccessRules access, ITicketNotifications notices)
     : IRequestHandler<IniciarTicketCommand, ResponseDto<TicketsResponseDto>>
 {
     public async Task<ResponseDto<TicketsResponseDto>> Handle(IniciarTicketCommand request, CancellationToken ct)

@@ -19,7 +19,7 @@ public class ObtenerPreferenciasNotificacionesQuery : IRequest<ResponseDto<Prefe
     }
 }
 
-internal sealed class ObtenerPreferenciasNotificacionesQueryHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor)
+internal sealed class ObtenerPreferenciasNotificacionesQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor)
     : IRequestHandler<ObtenerPreferenciasNotificacionesQuery, ResponseDto<PreferenciasNotificacionesResponseDto>>
 {
     public async Task<ResponseDto<PreferenciasNotificacionesResponseDto>> Handle(ObtenerPreferenciasNotificacionesQuery request, CancellationToken ct)

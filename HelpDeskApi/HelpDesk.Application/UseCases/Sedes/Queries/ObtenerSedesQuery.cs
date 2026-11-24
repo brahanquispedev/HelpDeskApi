@@ -17,7 +17,7 @@ public class ObtenerSedesQuery : IRequest<ResponseDto<SedesResponseDto>>
     }
 }
 
-internal sealed class ObtenerSedesQueryHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ObtenerSedesQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ObtenerSedesQuery, ResponseDto<SedesResponseDto>>
 {
     public async Task<ResponseDto<SedesResponseDto>> Handle(ObtenerSedesQuery request, CancellationToken ct)

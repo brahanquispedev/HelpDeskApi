@@ -21,7 +21,7 @@ public class ActualizarRolesCommand : IRequest<ResponseDto<RolesResponseDto>>
     public string? Descripcion { get; set; }
 }
 
-internal sealed class ActualizarRolesCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ActualizarRolesCommand, ResponseDto<RolesResponseDto>>
+internal sealed class ActualizarRolesCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ActualizarRolesCommand, ResponseDto<RolesResponseDto>>
 {
     public async Task<ResponseDto<RolesResponseDto>> Handle(ActualizarRolesCommand request, CancellationToken ct)
     {

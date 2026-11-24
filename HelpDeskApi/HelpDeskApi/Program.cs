@@ -17,7 +17,7 @@ if (crearAdministrador)
     using var scope = app.Services.CreateScope();
     try
     {
-        await scope.ServiceProvider.GetRequiredService<AuthService>().Bootstrap(new RegistroDto
+        await scope.ServiceProvider.GetRequiredService<IAuthService>().Bootstrap(new RegistroDto
         {
             Nombres = builder.Configuration["Bootstrap:Nombres"] ?? "Administrador",
             Apellidos = builder.Configuration["Bootstrap:Apellidos"] ?? "Inicial",

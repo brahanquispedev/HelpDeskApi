@@ -19,7 +19,7 @@ public class CrearPoliticasAtencionCommand : IRequest<ResponseDto<PoliticasAtenc
     public bool Activo { get; set; } = true;
 }
 
-internal sealed class CrearPoliticasAtencionCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<CrearPoliticasAtencionCommand, ResponseDto<PoliticasAtencionResponseDto>>
+internal sealed class CrearPoliticasAtencionCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<CrearPoliticasAtencionCommand, ResponseDto<PoliticasAtencionResponseDto>>
 {
     public async Task<ResponseDto<PoliticasAtencionResponseDto>> Handle(CrearPoliticasAtencionCommand request, CancellationToken ct)
     {

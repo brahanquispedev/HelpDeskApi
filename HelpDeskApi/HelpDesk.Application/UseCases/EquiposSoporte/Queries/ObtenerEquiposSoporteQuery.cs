@@ -17,7 +17,7 @@ public class ObtenerEquiposSoporteQuery : IRequest<ResponseDto<EquiposSoporteRes
     }
 }
 
-internal sealed class ObtenerEquiposSoporteQueryHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ObtenerEquiposSoporteQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ObtenerEquiposSoporteQuery, ResponseDto<EquiposSoporteResponseDto>>
 {
     public async Task<ResponseDto<EquiposSoporteResponseDto>> Handle(ObtenerEquiposSoporteQuery request, CancellationToken ct)

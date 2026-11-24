@@ -39,7 +39,7 @@ public class ActualizarActivoCommand : IRequest<ResponseDto<ActivosResponseDto>>
     public string? Modelo { get; set; }
 }
 
-internal sealed class ActualizarActivoCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ActualizarActivoCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ActualizarActivoCommand, ResponseDto<ActivosResponseDto>>
 {
     public async Task<ResponseDto<ActivosResponseDto>> Handle(ActualizarActivoCommand request, CancellationToken ct)

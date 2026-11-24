@@ -13,7 +13,7 @@ public class ObtenerAprobacionesQuery : IRequest<ResponseDto<AprobacionesRespons
     public Guid IdAprobacion { get; set; }
 }
 
-internal sealed class ObtenerAprobacionesQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ObtenerAprobacionesQuery, ResponseDto<AprobacionesResponseDto>>
+internal sealed class ObtenerAprobacionesQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ObtenerAprobacionesQuery, ResponseDto<AprobacionesResponseDto>>
 {
     public async Task<ResponseDto<AprobacionesResponseDto>> Handle(ObtenerAprobacionesQuery request, CancellationToken ct)
     {

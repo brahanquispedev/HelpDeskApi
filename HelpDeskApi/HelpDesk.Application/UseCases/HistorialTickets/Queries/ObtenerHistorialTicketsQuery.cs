@@ -13,7 +13,7 @@ public class ObtenerHistorialTicketsQuery : IRequest<ResponseDto<HistorialTicket
     public Guid IdHistorial { get; set; }
 }
 
-internal sealed class ObtenerHistorialTicketsQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ObtenerHistorialTicketsQuery, ResponseDto<HistorialTicketsResponseDto>>
+internal sealed class ObtenerHistorialTicketsQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ObtenerHistorialTicketsQuery, ResponseDto<HistorialTicketsResponseDto>>
 {
     public async Task<ResponseDto<HistorialTicketsResponseDto>> Handle(ObtenerHistorialTicketsQuery request, CancellationToken ct)
     {

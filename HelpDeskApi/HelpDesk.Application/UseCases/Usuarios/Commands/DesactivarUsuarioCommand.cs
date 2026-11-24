@@ -19,7 +19,7 @@ public class DesactivarUsuarioCommand : IRequest<ResponseDto<AccionResultadoDto>
     public string Motivo { get; set; } = string.Empty;
 }
 
-internal sealed class DesactivarUsuarioCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class DesactivarUsuarioCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<DesactivarUsuarioCommand, ResponseDto<AccionResultadoDto>>
 {
     public async Task<ResponseDto<AccionResultadoDto>> Handle(DesactivarUsuarioCommand r, CancellationToken ct)

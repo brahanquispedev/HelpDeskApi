@@ -16,7 +16,7 @@ public class ListarRolesQuery : IRequest<ResponseDto<PaginaDto<RolesResponseDto>
     public string? Buscar { get; set; }
 }
 
-internal sealed class ListarRolesQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarRolesQuery, ResponseDto<PaginaDto<RolesResponseDto>>>
+internal sealed class ListarRolesQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarRolesQuery, ResponseDto<PaginaDto<RolesResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<RolesResponseDto>>> Handle(ListarRolesQuery request, CancellationToken ct)
     {

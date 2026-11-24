@@ -14,7 +14,7 @@ public class ObtenerCambiosTicketsQuery : IRequest<ResponseDto<CambiosTicketsRes
     public Guid IdTicket { get; set; }
 }
 
-internal sealed class ObtenerCambiosTicketsQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ObtenerCambiosTicketsQuery, ResponseDto<CambiosTicketsResponseDto>>
+internal sealed class ObtenerCambiosTicketsQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ObtenerCambiosTicketsQuery, ResponseDto<CambiosTicketsResponseDto>>
 {
     public async Task<ResponseDto<CambiosTicketsResponseDto>> Handle(ObtenerCambiosTicketsQuery request, CancellationToken ct)
     {

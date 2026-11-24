@@ -28,7 +28,7 @@ public class ActualizarAdjuntosCommand : IRequest<ResponseDto<AdjuntosResponseDt
     public bool EsInterno { get; set; }
 }
 
-internal sealed class ActualizarAdjuntosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor) : IRequestHandler<ActualizarAdjuntosCommand, ResponseDto<AdjuntosResponseDto>>
+internal sealed class ActualizarAdjuntosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor) : IRequestHandler<ActualizarAdjuntosCommand, ResponseDto<AdjuntosResponseDto>>
 {
     public async Task<ResponseDto<AdjuntosResponseDto>> Handle(ActualizarAdjuntosCommand request, CancellationToken ct)
     {

@@ -15,7 +15,7 @@ public class ListarPoliticasAtencionQuery : IRequest<ResponseDto<PaginaDto<Polit
     public int Tamano { get; set; } = 20;
 }
 
-internal sealed class ListarPoliticasAtencionQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarPoliticasAtencionQuery, ResponseDto<PaginaDto<PoliticasAtencionResponseDto>>>
+internal sealed class ListarPoliticasAtencionQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarPoliticasAtencionQuery, ResponseDto<PaginaDto<PoliticasAtencionResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<PoliticasAtencionResponseDto>>> Handle(ListarPoliticasAtencionQuery request, CancellationToken ct)
     {

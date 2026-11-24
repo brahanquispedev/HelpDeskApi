@@ -19,7 +19,7 @@ public class AprobarSolicitudCommand : IRequest<ResponseDto<AccionResultadoDto>>
     public string Motivo { get; set; } = string.Empty;
 }
 
-internal sealed class AprobarSolicitudCommandHandler(IUnitOfWork _unitOfWork, ICurrentUser actor, AccessRules access)
+internal sealed class AprobarSolicitudCommandHandler(IUnitOfWork _unitOfWork, ICurrentUser actor, IAccessRules access)
     : IRequestHandler<AprobarSolicitudCommand, ResponseDto<AccionResultadoDto>>
 {
     public async Task<ResponseDto<AccionResultadoDto>> Handle(AprobarSolicitudCommand r, CancellationToken ct)

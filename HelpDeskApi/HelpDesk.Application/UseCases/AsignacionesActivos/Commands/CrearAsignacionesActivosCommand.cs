@@ -16,7 +16,7 @@ public class CrearAsignacionesActivosCommand : IRequest<ResponseDto<Asignaciones
     public string? Observaciones { get; set; }
 }
 
-internal sealed class CrearAsignacionesActivosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor) : IRequestHandler<CrearAsignacionesActivosCommand, ResponseDto<AsignacionesActivosResponseDto>>
+internal sealed class CrearAsignacionesActivosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor) : IRequestHandler<CrearAsignacionesActivosCommand, ResponseDto<AsignacionesActivosResponseDto>>
 {
     public async Task<ResponseDto<AsignacionesActivosResponseDto>> Handle(CrearAsignacionesActivosCommand request, CancellationToken ct)
     {

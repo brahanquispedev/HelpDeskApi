@@ -17,7 +17,7 @@ public class ObtenerEnviosNotificacionesQuery : IRequest<ResponseDto<EnviosNotif
     }
 }
 
-internal sealed class ObtenerEnviosNotificacionesQueryHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ObtenerEnviosNotificacionesQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ObtenerEnviosNotificacionesQuery, ResponseDto<EnviosNotificacionesResponseDto>>
 {
     public async Task<ResponseDto<EnviosNotificacionesResponseDto>> Handle(ObtenerEnviosNotificacionesQuery request, CancellationToken ct)

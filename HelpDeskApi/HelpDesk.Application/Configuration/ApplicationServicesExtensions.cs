@@ -12,9 +12,9 @@ public static class ApplicationServicesExtensions
         services.AddMediatR(typeof(ApplicationServicesExtensions).Assembly);
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
-        services.AddScoped<AccessRules>();
-        services.AddScoped<AuthService>();
-        services.AddScoped<TicketNotifications>();
+        services.AddScoped<IAccessRules, AccessRules>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ITicketNotifications, TicketNotifications>();
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<ITokenService, JwtService>();
         return services;

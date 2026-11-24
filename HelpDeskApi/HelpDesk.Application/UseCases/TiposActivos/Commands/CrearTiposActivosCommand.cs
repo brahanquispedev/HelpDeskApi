@@ -18,7 +18,7 @@ public class CrearTiposActivosCommand : IRequest<ResponseDto<TiposActivosRespons
     public bool Activo { get; set; } = true;
 }
 
-internal sealed class CrearTiposActivosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<CrearTiposActivosCommand, ResponseDto<TiposActivosResponseDto>>
+internal sealed class CrearTiposActivosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<CrearTiposActivosCommand, ResponseDto<TiposActivosResponseDto>>
 {
     public async Task<ResponseDto<TiposActivosResponseDto>> Handle(CrearTiposActivosCommand request, CancellationToken ct)
     {

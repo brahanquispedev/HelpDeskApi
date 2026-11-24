@@ -25,7 +25,7 @@ public class ResolverTicketCommand : IRequest<ResponseDto<TicketsResponseDto>>
     public Guid? IdTecnico { get; set; }
 }
 
-internal sealed class ResolverTicketCommandHandler(IUnitOfWork _unitOfWork, ICurrentUser actor, AccessRules access, TicketNotifications notices)
+internal sealed class ResolverTicketCommandHandler(IUnitOfWork _unitOfWork, ICurrentUser actor, IAccessRules access, ITicketNotifications notices)
     : IRequestHandler<ResolverTicketCommand, ResponseDto<TicketsResponseDto>>
 {
     public async Task<ResponseDto<TicketsResponseDto>> Handle(ResolverTicketCommand request, CancellationToken ct)

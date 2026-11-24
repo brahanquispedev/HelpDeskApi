@@ -17,7 +17,7 @@ public class ListarAsignacionesTicketsQuery : IRequest<ResponseDto<PaginaDto<Asi
     public Guid? IdTicket { get; set; }
 }
 
-internal sealed class ListarAsignacionesTicketsQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarAsignacionesTicketsQuery, ResponseDto<PaginaDto<AsignacionesTicketsResponseDto>>>
+internal sealed class ListarAsignacionesTicketsQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarAsignacionesTicketsQuery, ResponseDto<PaginaDto<AsignacionesTicketsResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<AsignacionesTicketsResponseDto>>> Handle(ListarAsignacionesTicketsQuery request, CancellationToken ct)
     {

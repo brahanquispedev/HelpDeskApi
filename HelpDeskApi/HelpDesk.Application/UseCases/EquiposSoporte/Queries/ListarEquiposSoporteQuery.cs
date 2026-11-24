@@ -13,7 +13,7 @@ public class ListarEquiposSoporteQuery : IRequest<ResponseDto<IEnumerable<Equipo
     public bool? SoloActivos { get; set; }
 }
 
-internal sealed class ListarEquiposSoporteQueryHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ListarEquiposSoporteQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ListarEquiposSoporteQuery, ResponseDto<IEnumerable<EquiposSoporteResponseDto>>>
 {
     public async Task<ResponseDto<IEnumerable<EquiposSoporteResponseDto>>> Handle(ListarEquiposSoporteQuery request, CancellationToken ct)

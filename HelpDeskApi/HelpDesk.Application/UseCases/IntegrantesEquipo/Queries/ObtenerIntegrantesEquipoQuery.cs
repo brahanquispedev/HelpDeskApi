@@ -19,7 +19,7 @@ public class ObtenerIntegrantesEquipoQuery : IRequest<ResponseDto<IntegrantesEqu
     }
 }
 
-internal sealed class ObtenerIntegrantesEquipoQueryHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ObtenerIntegrantesEquipoQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ObtenerIntegrantesEquipoQuery, ResponseDto<IntegrantesEquipoResponseDto>>
 {
     public async Task<ResponseDto<IntegrantesEquipoResponseDto>> Handle(ObtenerIntegrantesEquipoQuery request, CancellationToken ct)

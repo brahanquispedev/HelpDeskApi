@@ -18,7 +18,7 @@ public class DevolverActivoCommand : IRequest<ResponseDto<AccionResultadoDto>>
     public string Motivo { get; set; } = string.Empty;
 }
 
-internal sealed class DevolverActivoCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class DevolverActivoCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<DevolverActivoCommand, ResponseDto<AccionResultadoDto>>
 {
     public async Task<ResponseDto<AccionResultadoDto>> Handle(DevolverActivoCommand r, CancellationToken ct)
