@@ -39,6 +39,10 @@ internal sealed class ResolverTicketCommandHandler(IUnitOfWork _unitOfWork, ICur
             var before = t.Estado;
             var now = DateTime.UtcNow;
             access.EnsureWork(t);
+            if (t.IdTecnicoAsignado != actor.Id)
+            {
+                throw new BusinessException(403, "Solo el tecnico asignado puede resolver el ticket.");
+            }
             Validation.Require(t.Estado == "en_atencion", "Debe estar en atencion.", 409);
             t.Estado = "resuelto";
             t.Solucion = request.Motivo;

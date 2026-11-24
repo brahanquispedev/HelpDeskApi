@@ -39,6 +39,10 @@ internal sealed class IniciarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurr
             var before = t.Estado;
             var now = DateTime.UtcNow;
             access.EnsureWork(t);
+            if (t.IdTecnicoAsignado != actor.Id)
+            {
+                throw new BusinessException(403, "Solo el tecnico asignado puede iniciar la atencion.");
+            }
             Validation.Require(t.Estado == "asignado", "Debe estar asignado.", 409);
             t.Estado = "en_atencion";
             t.FechaPrimeraRespuesta ??= now;
