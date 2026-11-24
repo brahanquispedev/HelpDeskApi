@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.Notificaciones;
@@ -37,7 +36,11 @@ internal sealed class ActualizarNotificacionesCommandHandler(IUnitOfWork _unitOf
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdNotificacion == Guid.Empty)
+            {
+                throw new ValidationException("IdNotificacion debe ser un identificador valido.");
+            }
             if (!access.Admin) access.Permission("usuarios.administrar");
 
             var repo = _unitOfWork.Repository<Domain.Models.Notificaciones>();
@@ -69,6 +72,10 @@ internal sealed class ActualizarNotificacionesCommandHandler(IUnitOfWork _unitOf
             };
 
             return new ResponseDto<NotificacionesResponseDto>(200, dto, "Notificacion actualizada correctamente.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<NotificacionesResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

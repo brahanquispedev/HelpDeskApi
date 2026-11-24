@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Activos;
 using HelpDesk.Domain.Dtos.Common;
@@ -29,7 +28,11 @@ internal sealed class CambiarEstadoActivoCommandHandler(IUnitOfWork _unitOfWork,
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdActivo == Guid.Empty)
+            {
+                throw new ValidationException("IdActivo debe ser un identificador valido.");
+            }
             if (!access.Admin) access.Permission("activos.administrar");
 
             var entity = await _unitOfWork.Repository<ActivoEntity>().GetByIdAsync([request.IdActivo])
@@ -37,32 +40,51 @@ internal sealed class CambiarEstadoActivoCommandHandler(IUnitOfWork _unitOfWork,
 
             var estado = request.Estado.Trim().ToLowerInvariant();
             if (estado == "baja") estado = "retirado";
-            Validation.Require(estado is "disponible" or "mantenimiento" or "retirado", "Estado no permitido.");
-            Validation.Require(entity.Estado is not ("baja" or "retirado" or "perdido"), "El activo ya no esta operativo.", 409);
-            Validation.Require(entity.Estado != estado, "El activo ya se encuentra en ese estado.", 409);
+            if (!(estado is "disponible" or "mantenimiento" or "retirado"))
+            {
+                throw new BusinessException(400, "Estado no permitido.");
+            }
+            if (!(entity.Estado is not ("baja" or "retirado" or "perdido")))
+            {
+                throw new BusinessException(409, "El activo ya no esta operativo.");
+            }
+            if (!(entity.Estado != estado))
+            {
+                throw new BusinessException(409, "El activo ya se encuentra en ese estado.");
+            }
 
             if (estado == "retirado")
             {
                 var tieneAsignacionVigente = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesActivos>().Query()
                     .AnyAsync(x => x.IdActivo == entity.IdActivo && x.FechaDevolucion == null, ct);
-                Validation.Require(!tieneAsignacionVigente,
-                    "No se puede dar de baja un activo con asignacion vigente.", 409);
+                if (!(!tieneAsignacionVigente))
+                {
+                    throw new BusinessException(409, "No se puede dar de baja un activo con asignacion vigente.");
+                }
             }
             else if (estado == "mantenimiento")
             {
-                Validation.Require(entity.Estado == "disponible",
-                    "Solo un activo disponible puede pasar a mantenimiento.", 409);
+                if (!(entity.Estado == "disponible"))
+                {
+                    throw new BusinessException(409, "Solo un activo disponible puede pasar a mantenimiento.");
+                }
             }
             else if (estado == "disponible")
             {
-                Validation.Require(entity.Estado == "mantenimiento",
-                    "Solo un activo en mantenimiento puede volver a disponible.", 409);
+                if (!(entity.Estado == "mantenimiento"))
+                {
+                    throw new BusinessException(409, "Solo un activo en mantenimiento puede volver a disponible.");
+                }
             }
 
             entity.Estado = estado;
             await _unitOfWork.Complete();
 
             return new ResponseDto<ActivosResponseDto>(200, ToDto(entity), "Estado del activo actualizado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<ActivosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

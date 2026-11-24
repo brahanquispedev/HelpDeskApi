@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Usuarios;
 using HelpDesk.Domain.Exceptions;
@@ -36,13 +35,19 @@ internal sealed class CrearUsuariosCommandHandler(IUnitOfWork _unitOfWork, IAcce
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             if (request.IdArea is Guid idArea)
             {
                 var area = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Areas>().GetByIdAsync([idArea])
                     ?? throw new BusinessException(400, "El area no existe.");
-                Validation.Require(area.Activo, "El area esta inactiva.");
+                if (!(area.Activo))
+                {
+                    throw new BusinessException(400, "El area esta inactiva.");
+                }
             }
             var entity = new global::HelpDesk.Domain.Models.Usuarios()
             {
@@ -59,7 +64,10 @@ internal sealed class CrearUsuariosCommandHandler(IUnitOfWork _unitOfWork, IAcce
             var userInput = request;
             entity.NombreUsuario = entity.NombreUsuario.Trim();
             entity.Correo = entity.Correo.Trim().ToLowerInvariant();
-            Validation.Require(!string.IsNullOrWhiteSpace(userInput.Clave), "Clave es obligatoria al crear un usuario.");
+            if (!(!string.IsNullOrWhiteSpace(userInput.Clave)))
+            {
+                throw new BusinessException(400, "Clave es obligatoria al crear un usuario.");
+            }
             if (!string.IsNullOrWhiteSpace(userInput.Clave)) entity.ClaveHash = passwords.Hash(userInput.Clave);
 
             await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().AddAsync(entity);
@@ -76,6 +84,10 @@ internal sealed class CrearUsuariosCommandHandler(IUnitOfWork _unitOfWork, IAcce
                 Activo = entity.Activo,
                 FechaRegistro = entity.FechaRegistro
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<UsuariosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

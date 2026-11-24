@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Servicios;
 using HelpDesk.Domain.Exceptions;
@@ -30,8 +29,19 @@ internal sealed class CrearServiciosCommandHandler(IUnitOfWork _unitOfWork, IAcc
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdEquipoResponsable == Guid.Empty)
+            {
+                throw new ValidationException("IdEquipoResponsable debe ser un identificador valido.");
+            }
+            if (request.IdCategoriaServicio == Guid.Empty)
+            {
+                throw new ValidationException("IdCategoriaServicio debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new global::HelpDesk.Domain.Models.Servicios()
             {
                 IdServicio = Guid.NewGuid(),
@@ -55,6 +65,10 @@ internal sealed class CrearServiciosCommandHandler(IUnitOfWork _unitOfWork, IAcc
                 RequiereAprobacion = entity.RequiereAprobacion,
                 Activo = entity.Activo
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<ServiciosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
 using Microsoft.EntityFrameworkCore;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Application.Services;
 using HelpDesk.Domain.Dtos.Tickets;
@@ -36,7 +35,11 @@ internal sealed class CrearTicketsCommandHandler(IUnitOfWork _unitOfWork, IAcces
         try
         {
 
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdServicio == Guid.Empty)
+            {
+                throw new ValidationException("IdServicio debe ser un identificador valido.");
+            }
             if (!access.Admin) access.Permission("tickets.crear");
             var entity = new global::HelpDesk.Domain.Models.Tickets()
             {
@@ -52,13 +55,23 @@ internal sealed class CrearTicketsCommandHandler(IUnitOfWork _unitOfWork, IAcces
                 FechaLimiteResolucion = DateTime.UtcNow
             };
             var user = await Required<global::HelpDesk.Domain.Models.Usuarios>(actor.Id);
-            Validation.Require(user.IdArea.HasValue, "Asigne un area al usuario antes de crear tickets.");
-            Validation.Require((await Required<global::HelpDesk.Domain.Models.Areas>(user.IdArea!.Value)).Activo,
-                "El area del usuario esta inactiva. Asigne un area activa antes de crear tickets.");
+            if (!(user.IdArea.HasValue))
+            {
+                throw new BusinessException(400, "Asigne un area al usuario antes de crear tickets.");
+            }
+            if (!((await Required<global::HelpDesk.Domain.Models.Areas>(user.IdArea!.Value)).Activo))
+            {
+                throw new BusinessException(400, "El area del usuario esta inactiva. Asigne un area activa antes de crear tickets.");
+            }
             var service = await Required<global::HelpDesk.Domain.Models.Servicios>(entity.IdServicio);
-            Validation.Require(service.Activo, "El servicio esta inactivo.");
-            Validation.Require((await Required<global::HelpDesk.Domain.Models.EquiposSoporte>(service.IdEquipoResponsable)).Activo,
-                "El equipo responsable del servicio esta inactivo.");
+            if (!(service.Activo))
+            {
+                throw new BusinessException(400, "El servicio esta inactivo.");
+            }
+            if (!((await Required<global::HelpDesk.Domain.Models.EquiposSoporte>(service.IdEquipoResponsable)).Activo))
+            {
+                throw new BusinessException(400, "El equipo responsable del servicio esta inactivo.");
+            }
             var policy = (await (_unitOfWork.Repository<global::HelpDesk.Domain.Models.PoliticasAtencion>().Query().Where(x => x.Prioridad == entity.Prioridad && x.Activo)).ToListAsync()).SingleOrDefault()
             ?? throw new BusinessException(400, "Configure una politica activa para esta prioridad.");
             entity.IdSolicitante = actor.Id;
@@ -140,6 +153,10 @@ internal sealed class CrearTicketsCommandHandler(IUnitOfWork _unitOfWork, IAcces
                 FechaCancelacion = entity.FechaCancelacion,
                 Version = entity.Version
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<TicketsResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

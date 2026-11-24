@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Activos;
 using HelpDesk.Domain.Exceptions;
@@ -22,15 +21,24 @@ internal sealed class EliminarActivosCommandHandler(IUnitOfWork _unitOfWork, IAc
     {
         try
         {
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Activos>().GetByIdAsync(request.Keys)
                          ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
 
             var asignado = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesActivos>().Query()
                 .AnyAsync(x => x.IdActivo == entity.IdActivo && x.FechaDevolucion == null);
-            Validation.Require(!asignado, "Devuelva el activo antes de darlo de baja.", 409);
-            Validation.Require(entity.Estado != "baja", "El activo ya esta dado de baja.", 409);
+            if (!(!asignado))
+            {
+                throw new BusinessException(409, "Devuelva el activo antes de darlo de baja.");
+            }
+            if (!(entity.Estado != "baja"))
+            {
+                throw new BusinessException(409, "El activo ya esta dado de baja.");
+            }
             entity.Estado = "baja";
             await _unitOfWork.Complete();
             return new ResponseDto<OperacionDto>(200, new OperacionDto(true), "Activo dado de baja.");

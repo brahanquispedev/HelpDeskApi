@@ -1,4 +1,4 @@
-using HelpDesk.Application.Common;
+using System.ComponentModel.DataAnnotations;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.IntegrantesEquipo;
@@ -24,7 +24,15 @@ internal sealed class ActualizarIntegrantesEquipoCommandHandler(IUnitOfWork _uni
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdEquipo == Guid.Empty)
+            {
+                throw new ValidationException("IdEquipo debe ser un identificador valido.");
+            }
+            if (request.IdUsuario == Guid.Empty)
+            {
+                throw new ValidationException("IdUsuario debe ser un identificador valido.");
+            }
             if (!access.Admin) access.Permission("organizacion.administrar");
 
             var repo = _unitOfWork.Repository<Domain.Models.IntegrantesEquipo>();
@@ -51,6 +59,10 @@ internal sealed class ActualizarIntegrantesEquipoCommandHandler(IUnitOfWork _uni
             };
 
             return new ResponseDto<IntegrantesEquipoResponseDto>(200, dto, "Integrante de equipo actualizado correctamente.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<IntegrantesEquipoResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

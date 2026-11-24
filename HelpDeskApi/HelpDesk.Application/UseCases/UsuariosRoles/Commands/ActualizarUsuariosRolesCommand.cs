@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.UsuariosRoles;
 using HelpDesk.Domain.Exceptions;
@@ -26,8 +25,19 @@ internal sealed class ActualizarUsuariosRolesCommandHandler(IUnitOfWork _unitOfW
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdUsuario == Guid.Empty)
+            {
+                throw new ValidationException("IdUsuario debe ser un identificador valido.");
+            }
+            if (request.IdRol == Guid.Empty)
+            {
+                throw new ValidationException("IdRol debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.UsuariosRoles>().GetByIdAsync(request.Keys)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
@@ -41,6 +51,10 @@ internal sealed class ActualizarUsuariosRolesCommandHandler(IUnitOfWork _unitOfW
                 IdRol = entity.IdRol,
                 FechaAsignacion = entity.FechaAsignacion
             }, "Registro actualizado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<UsuariosRolesResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

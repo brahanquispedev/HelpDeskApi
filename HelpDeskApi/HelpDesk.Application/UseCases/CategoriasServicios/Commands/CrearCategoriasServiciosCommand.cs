@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.CategoriasServicios;
 using HelpDesk.Domain.Exceptions;
@@ -25,8 +24,11 @@ internal sealed class CrearCategoriasServiciosCommandHandler(IUnitOfWork _unitOf
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new global::HelpDesk.Domain.Models.CategoriasServicios()
             {
                 IdCategoriaServicio = Guid.NewGuid(),
@@ -44,6 +46,10 @@ internal sealed class CrearCategoriasServiciosCommandHandler(IUnitOfWork _unitOf
                 Descripcion = entity.Descripcion,
                 Activo = entity.Activo
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<CategoriasServiciosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

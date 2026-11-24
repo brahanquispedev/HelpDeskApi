@@ -1,7 +1,6 @@
 using HelpDesk.Domain.Dtos.Reportes;
 using HelpDesk.Domain.Dtos.Common;
 using Microsoft.EntityFrameworkCore;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;

@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Adjuntos;
 using HelpDesk.Domain.Exceptions;
@@ -31,8 +30,15 @@ internal sealed class CrearAdjuntosCommandHandler(IUnitOfWork _unitOfWork, IAcce
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdTicket == Guid.Empty)
+            {
+                throw new ValidationException("IdTicket debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new global::HelpDesk.Domain.Models.Adjuntos()
             {
                 IdAdjunto = Guid.NewGuid(),
@@ -53,7 +59,10 @@ internal sealed class CrearAdjuntosCommandHandler(IUnitOfWork _unitOfWork, IAcce
             if (entity.IdComentario is Guid commentId)
             {
                 var parent = await Required<global::HelpDesk.Domain.Models.Comentarios>(commentId);
-                Validation.Require(parent.IdTicket == entity.IdTicket, "El comentario pertenece a otro ticket.");
+                if (!(parent.IdTicket == entity.IdTicket))
+                {
+                    throw new BusinessException(400, "El comentario pertenece a otro ticket.");
+                }
                 if (parent.EsInterno) entity.EsInterno = true;
             }
 
@@ -71,6 +80,10 @@ internal sealed class CrearAdjuntosCommandHandler(IUnitOfWork _unitOfWork, IAcce
                 EsInterno = entity.EsInterno,
                 Fecha = entity.Fecha
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<AdjuntosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

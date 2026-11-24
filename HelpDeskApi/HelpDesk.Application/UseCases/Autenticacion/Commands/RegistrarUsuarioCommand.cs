@@ -1,4 +1,4 @@
-using HelpDesk.Application.Common;
+using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Autenticacion;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Exceptions;
@@ -19,17 +19,23 @@ internal sealed class RegistrarUsuarioCommandHandler(IUnitOfWork _unitOfWork, IP
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
             var nombreUsuario = request.NombreUsuario.Trim();
             var correo = request.Correo.Trim().ToLowerInvariant();
 
             var existe = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().Query()
                 .AnyAsync(u => u.NombreUsuario.ToLower() == nombreUsuario.ToLower() || u.Correo == correo, ct);
-            Validation.Require(!existe, "El nombre de usuario o el correo ya estan registrados.", 409);
+            if (!(!existe))
+            {
+                throw new BusinessException(409, "El nombre de usuario o el correo ya estan registrados.");
+            }
 
             var rolEmpleado = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().Query()
                 .SingleOrDefaultAsync(r => r.Nombre == "empleado");
-            Validation.Require(rolEmpleado is not null, "Falta el rol empleado del catalogo inicial.", 409);
+            if (!(rolEmpleado is not null))
+            {
+                throw new BusinessException(409, "Falta el rol empleado del catalogo inicial.");
+            }
 
             var usuario = new global::HelpDesk.Domain.Models.Usuarios
             {
@@ -55,6 +61,10 @@ internal sealed class RegistrarUsuarioCommandHandler(IUnitOfWork _unitOfWork, IP
             return new ResponseDto<UsuarioRegistradoDto>(
                 201,
                 new UsuarioRegistradoDto(usuario.IdUsuario, usuario.NombreUsuario));
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<UsuarioRegistradoDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

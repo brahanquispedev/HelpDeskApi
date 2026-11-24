@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
 using Microsoft.EntityFrameworkCore;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Activos;
 using HelpDesk.Domain.Exceptions;
@@ -40,8 +39,19 @@ internal sealed class ActualizarActivosCommandHandler(IUnitOfWork _unitOfWork, I
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdSede == Guid.Empty)
+            {
+                throw new ValidationException("IdSede debe ser un identificador valido.");
+            }
+            if (request.IdTipoActivo == Guid.Empty)
+            {
+                throw new ValidationException("IdTipoActivo debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Activos>().GetByIdAsync(request.Keys)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
@@ -56,7 +66,10 @@ internal sealed class ActualizarActivosCommandHandler(IUnitOfWork _unitOfWork, I
             entity.Modelo = request.Modelo;
             entity.Estado = request.Estado;
             var assigned = await (_unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesActivos>().Query().Where(x => x.IdActivo == entity.IdActivo && x.FechaDevolucion == null)).CountAsync();
-            Validation.Require((assigned > 0) == (entity.Estado == "asignado"), "Cambie la asignacion con asignar/devolver; el estado debe coincidir.", 409);
+            if (!((assigned > 0) == (entity.Estado == "asignado")))
+            {
+                throw new BusinessException(409, "Cambie la asignacion con asignar/devolver; el estado debe coincidir.");
+            }
             await _unitOfWork.Complete();
             return new ResponseDto<ActivosResponseDto>(200, new ActivosResponseDto
             {
@@ -72,6 +85,10 @@ internal sealed class ActualizarActivosCommandHandler(IUnitOfWork _unitOfWork, I
                 Estado = entity.Estado,
                 FechaRegistro = entity.FechaRegistro
             }, "Registro actualizado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<ActivosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

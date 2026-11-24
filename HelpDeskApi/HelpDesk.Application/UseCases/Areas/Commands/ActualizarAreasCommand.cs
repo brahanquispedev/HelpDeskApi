@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Areas;
 using HelpDesk.Domain.Dtos.Common;
@@ -29,7 +28,15 @@ internal sealed class ActualizarAreasCommandHandler(IUnitOfWork _unitOfWork, IAc
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdArea == Guid.Empty)
+            {
+                throw new ValidationException("IdArea debe ser un identificador valido.");
+            }
+            if (request.IdSede == Guid.Empty)
+            {
+                throw new ValidationException("IdSede debe ser un identificador valido.");
+            }
             if (!access.Admin) access.Permission("organizacion.administrar");
 
             var repo = _unitOfWork.Repository<Domain.Models.Areas>();
@@ -40,13 +47,19 @@ internal sealed class ActualizarAreasCommandHandler(IUnitOfWork _unitOfWork, IAc
             }
 
             var sede = await _unitOfWork.Repository<Domain.Models.Sedes>().GetByIdAsync([request.IdSede]);
-            Validation.Require(sede != null, "La sede especificada no existe.");
+            if (!(sede != null))
+            {
+                throw new BusinessException(400, "La sede especificada no existe.");
+            }
 
             var existeNombre = await repo.Query().AnyAsync(
                 a => a.IdArea != request.IdArea && a.IdSede == request.IdSede && a.Nombre.ToLower() == request.Nombre.Trim().ToLower(),
                 ct
             );
-            Validation.Require(!existeNombre, "Ya existe otra area con el mismo nombre en esta sede.");
+            if (!(!existeNombre))
+            {
+                throw new BusinessException(400, "Ya existe otra area con el mismo nombre en esta sede.");
+            }
 
             entity.IdSede = request.IdSede;
             entity.Nombre = request.Nombre.Trim();
@@ -64,6 +77,10 @@ internal sealed class ActualizarAreasCommandHandler(IUnitOfWork _unitOfWork, IAc
             };
 
             return new ResponseDto<AreasResponseDto>(200, dto, "Area actualizada correctamente.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<AreasResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

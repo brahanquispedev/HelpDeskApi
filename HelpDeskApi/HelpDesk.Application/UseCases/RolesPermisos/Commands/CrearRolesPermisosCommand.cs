@@ -1,4 +1,4 @@
-using HelpDesk.Application.Common;
+using System.ComponentModel.DataAnnotations;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.RolesPermisos;
@@ -21,8 +21,19 @@ internal sealed class CrearRolesPermisosCommandHandler(IUnitOfWork _unitOfWork, 
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdRol == Guid.Empty)
+            {
+                throw new ValidationException("IdRol debe ser un identificador valido.");
+            }
+            if (request.IdPermiso == Guid.Empty)
+            {
+                throw new ValidationException("IdPermiso debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new Dictionary<string, object>() { ["IdRol"] = request.IdRol, ["IdPermiso"] = request.IdPermiso };
 
             await _unitOfWork.Repository<Dictionary<string, object>>("RolesPermisos").AddAsync(entity);
@@ -32,6 +43,10 @@ internal sealed class CrearRolesPermisosCommandHandler(IUnitOfWork _unitOfWork, 
                 IdRol = (Guid)entity["IdRol"],
                 IdPermiso = (Guid)entity["IdPermiso"]
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<RolesPermisosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

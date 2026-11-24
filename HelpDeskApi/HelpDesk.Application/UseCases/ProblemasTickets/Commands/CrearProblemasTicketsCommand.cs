@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.ProblemasTickets;
 using HelpDesk.Domain.Exceptions;
@@ -22,8 +21,19 @@ internal sealed class CrearProblemasTicketsCommandHandler(IUnitOfWork _unitOfWor
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdProblema == Guid.Empty)
+            {
+                throw new ValidationException("IdProblema debe ser un identificador valido.");
+            }
+            if (request.IdTicket == Guid.Empty)
+            {
+                throw new ValidationException("IdTicket debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new Dictionary<string, object>() { ["IdProblema"] = request.IdProblema, ["IdTicket"] = request.IdTicket };
 
             await _unitOfWork.Repository<Dictionary<string, object>>("ProblemasTickets").AddAsync(entity);
@@ -33,6 +43,10 @@ internal sealed class CrearProblemasTicketsCommandHandler(IUnitOfWork _unitOfWor
                 IdProblema = (Guid)entity["IdProblema"],
                 IdTicket = (Guid)entity["IdTicket"]
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<ProblemasTicketsResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

@@ -1,6 +1,5 @@
 using HelpDesk.Domain.Dtos.Common;
 using Microsoft.EntityFrameworkCore;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Usuarios;
 using HelpDesk.Domain.Exceptions;
@@ -23,8 +22,10 @@ internal sealed class ListarUsuariosQueryHandler(IUnitOfWork _unitOfWork, IAcces
         try
         {
 
-            Validation.Require(request.Pagina >= 1 && request.Pagina <= 1000000 && request.Tamano is >= 1 and <= 100,
-            "Pagina debe ser positiva y tamano debe estar entre 1 y 100.");
+            if (!(request.Pagina >= 1 && request.Pagina <= 1000000 && request.Tamano is >= 1 and <= 100))
+            {
+                throw new BusinessException(400, "Pagina debe ser positiva y tamano debe estar entre 1 y 100.");
+            }
             var query = access.Scope(_unitOfWork.Repository<global::HelpDesk.Domain.Models.Usuarios>().Query());
             if (!string.IsNullOrWhiteSpace(request.Buscar)) query = query.Where(x => x.Nombres.Contains(request.Buscar) || x.Apellidos.Contains(request.Buscar) || x.NombreUsuario.Contains(request.Buscar));
             var total = await (query).CountAsync();

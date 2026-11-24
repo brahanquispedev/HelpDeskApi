@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Activos;
 using HelpDesk.Domain.Exceptions;
@@ -35,8 +34,19 @@ internal sealed class CrearActivosCommandHandler(IUnitOfWork _unitOfWork, IAcces
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdSede == Guid.Empty)
+            {
+                throw new ValidationException("IdSede debe ser un identificador valido.");
+            }
+            if (request.IdTipoActivo == Guid.Empty)
+            {
+                throw new ValidationException("IdTipoActivo debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new global::HelpDesk.Domain.Models.Activos()
             {
                 IdActivo = Guid.NewGuid(),
@@ -51,7 +61,10 @@ internal sealed class CrearActivosCommandHandler(IUnitOfWork _unitOfWork, IAcces
                 Estado = request.Estado,
                 FechaRegistro = DateTime.UtcNow
             };
-            Validation.Require(entity.Estado != "asignado", "Primero registre el activo y despues su asignacion.");
+            if (!(entity.Estado != "asignado"))
+            {
+                throw new BusinessException(400, "Primero registre el activo y despues su asignacion.");
+            }
             await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Activos>().AddAsync(entity);
             await _unitOfWork.Complete();
             return new ResponseDto<ActivosResponseDto>(201, new ActivosResponseDto
@@ -68,6 +81,10 @@ internal sealed class CrearActivosCommandHandler(IUnitOfWork _unitOfWork, IAcces
                 Estado = entity.Estado,
                 FechaRegistro = entity.FechaRegistro
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<ActivosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

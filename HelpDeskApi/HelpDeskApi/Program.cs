@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using HelpDesk.Api.Configuration;
 using HelpDesk.Application.Configuration;
 using HelpDesk.Infrastructure.Configuration;
@@ -26,6 +27,11 @@ if (crearAdministrador)
             Clave = builder.Configuration["Bootstrap:Clave"] ?? string.Empty
         });
         Console.WriteLine("Administrador inicial creado correctamente.");
+    }
+    catch (ValidationException ex)
+    {
+        Console.Error.WriteLine(ex.Message);
+        Environment.ExitCode = 1;
     }
     catch (BusinessException ex)
     {

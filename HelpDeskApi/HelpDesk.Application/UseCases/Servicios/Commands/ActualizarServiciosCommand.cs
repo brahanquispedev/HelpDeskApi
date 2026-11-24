@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Servicios;
 using HelpDesk.Domain.Exceptions;
@@ -34,8 +33,19 @@ internal sealed class ActualizarServiciosCommandHandler(IUnitOfWork _unitOfWork,
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdEquipoResponsable == Guid.Empty)
+            {
+                throw new ValidationException("IdEquipoResponsable debe ser un identificador valido.");
+            }
+            if (request.IdCategoriaServicio == Guid.Empty)
+            {
+                throw new ValidationException("IdCategoriaServicio debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Servicios>().GetByIdAsync(request.Keys)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
@@ -58,6 +68,10 @@ internal sealed class ActualizarServiciosCommandHandler(IUnitOfWork _unitOfWork,
                 RequiereAprobacion = entity.RequiereAprobacion,
                 Activo = entity.Activo
             }, "Registro actualizado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<ServiciosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

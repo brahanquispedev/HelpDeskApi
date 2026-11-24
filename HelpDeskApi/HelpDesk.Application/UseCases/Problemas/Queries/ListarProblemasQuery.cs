@@ -1,6 +1,5 @@
 using HelpDesk.Domain.Dtos.Common;
 using Microsoft.EntityFrameworkCore;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Problemas;
 using HelpDesk.Domain.Exceptions;
@@ -24,8 +23,10 @@ internal sealed class ListarProblemasQueryHandler(IUnitOfWork _unitOfWork, IAcce
         try
         {
 
-            Validation.Require(request.Pagina >= 1 && request.Pagina <= 1000000 && request.Tamano is >= 1 and <= 100,
-            "Pagina debe ser positiva y tamano debe estar entre 1 y 100.");
+            if (!(request.Pagina >= 1 && request.Pagina <= 1000000 && request.Tamano is >= 1 and <= 100))
+            {
+                throw new BusinessException(400, "Pagina debe ser positiva y tamano debe estar entre 1 y 100.");
+            }
             var query = access.Scope(_unitOfWork.Repository<global::HelpDesk.Domain.Models.Problemas>().Query());
             if (!string.IsNullOrWhiteSpace(request.Buscar)) query = query.Where(x => x.Titulo.Contains(request.Buscar) || x.Descripcion.Contains(request.Buscar));
             if (!string.IsNullOrWhiteSpace(request.Estado)) query = query.Where(x => x.Estado == request.Estado);

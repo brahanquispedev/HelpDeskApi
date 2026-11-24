@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
@@ -25,7 +24,11 @@ internal sealed class ActivarUsuarioCommandHandler(IUnitOfWork _unitOfWork, IAcc
     {
         try
         {
-            Validation.Check(r);
+            Validator.ValidateObject(r, new ValidationContext(r), validateAllProperties: true);
+            if (r.Id == Guid.Empty)
+            {
+                throw new ValidationException("Id debe ser un identificador valido.");
+            }
             var result = "completado";
             access.Permission("usuarios.administrar");
             var user = await Required<global::HelpDesk.Domain.Models.Usuarios>(r.Id);
@@ -34,6 +37,10 @@ internal sealed class ActivarUsuarioCommandHandler(IUnitOfWork _unitOfWork, IAcc
             result = user.Activo ? "activo" : "inactivo";
             await _unitOfWork.Complete();
             return new ResponseDto<AccionResultadoDto>(200, new AccionResultadoDto(r.Id, result));
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<AccionResultadoDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.TareasCambios;
 using HelpDesk.Domain.Exceptions;
@@ -34,8 +33,15 @@ internal sealed class ActualizarTareasCambiosCommandHandler(IUnitOfWork _unitOfW
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdCambio == Guid.Empty)
+            {
+                throw new ValidationException("IdCambio debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.TareasCambios>().GetByIdAsync(request.Keys)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
@@ -61,6 +67,10 @@ internal sealed class ActualizarTareasCambiosCommandHandler(IUnitOfWork _unitOfW
                 FechaCreacion = entity.FechaCreacion,
                 FechaFinalizacion = entity.FechaFinalizacion
             }, "Registro actualizado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<TareasCambiosResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

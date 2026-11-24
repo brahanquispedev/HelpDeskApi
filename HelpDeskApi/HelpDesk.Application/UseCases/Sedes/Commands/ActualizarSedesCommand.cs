@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.Sedes;
@@ -31,7 +30,11 @@ internal sealed class ActualizarSedesCommandHandler(IUnitOfWork _unitOfWork, IAc
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdSede == Guid.Empty)
+            {
+                throw new ValidationException("IdSede debe ser un identificador valido.");
+            }
             if (!access.Admin) access.Permission("organizacion.administrar");
 
             var repo = _unitOfWork.Repository<Domain.Models.Sedes>();
@@ -42,7 +45,10 @@ internal sealed class ActualizarSedesCommandHandler(IUnitOfWork _unitOfWork, IAc
             }
 
             var existeNombre = await repo.Query().AnyAsync(s => s.IdSede != request.IdSede && s.Nombre.ToLower() == request.Nombre.Trim().ToLower(), ct);
-            Validation.Require(!existeNombre, "Ya existe otra sede con el mismo nombre.");
+            if (!(!existeNombre))
+            {
+                throw new BusinessException(400, "Ya existe otra sede con el mismo nombre.");
+            }
 
             entity.Nombre = request.Nombre.Trim();
             entity.Direccion = request.Direccion?.Trim();
@@ -60,6 +66,10 @@ internal sealed class ActualizarSedesCommandHandler(IUnitOfWork _unitOfWork, IAc
             };
 
             return new ResponseDto<SedesResponseDto>(200, dto, "Sede actualizada correctamente.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<SedesResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.EquiposSoporte;
@@ -31,7 +30,11 @@ internal sealed class ActualizarEquiposSoporteCommandHandler(IUnitOfWork _unitOf
     {
         try
         {
-            Validation.Check(request);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdEquipo == Guid.Empty)
+            {
+                throw new ValidationException("IdEquipo debe ser un identificador valido.");
+            }
             if (!access.Admin) access.Permission("organizacion.administrar");
 
             var repo = _unitOfWork.Repository<Domain.Models.EquiposSoporte>();
@@ -45,7 +48,10 @@ internal sealed class ActualizarEquiposSoporteCommandHandler(IUnitOfWork _unitOf
                 e => e.IdEquipo != request.IdEquipo && e.Nombre.ToLower() == request.Nombre.Trim().ToLower(),
                 ct
             );
-            Validation.Require(!existeNombre, "Ya existe otro equipo de soporte con el mismo nombre.");
+            if (!(!existeNombre))
+            {
+                throw new BusinessException(400, "Ya existe otro equipo de soporte con el mismo nombre.");
+            }
 
             entity.Nombre = request.Nombre.Trim();
             entity.Descripcion = request.Descripcion?.Trim();
@@ -63,6 +69,10 @@ internal sealed class ActualizarEquiposSoporteCommandHandler(IUnitOfWork _unitOf
             };
 
             return new ResponseDto<EquiposSoporteResponseDto>(200, dto, "Equipo de soporte actualizado correctamente.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<EquiposSoporteResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Exceptions;
@@ -21,11 +20,24 @@ internal sealed class EliminarRolesCommandHandler(IUnitOfWork _unitOfWork, IAcce
     {
         try
         {
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>().GetByIdAsync(request.Keys)
                          ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
-            Validation.Require(!new[] { "administrador", "empleado", "tecnico", "coordinador", "aprobador" }.Contains(entity.Nombre), "Los roles base se conservan.", 409);
+            if (!(!new[]
+            {
+                "administrador",
+                "empleado",
+                "tecnico",
+                "coordinador",
+                "aprobador"
+            }.Contains(entity.Nombre)))
+            {
+                throw new BusinessException(409, "Los roles base se conservan.");
+            }
             _unitOfWork.Repository<global::HelpDesk.Domain.Models.Roles>(null).Delete(entity);
             await _unitOfWork.Complete();
             return new ResponseDto<OperacionDto>(200, new OperacionDto(true), "Registro eliminado.");

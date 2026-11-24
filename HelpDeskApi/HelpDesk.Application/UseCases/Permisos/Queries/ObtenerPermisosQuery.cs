@@ -1,5 +1,4 @@
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Permisos;
 using HelpDesk.Domain.Exceptions;

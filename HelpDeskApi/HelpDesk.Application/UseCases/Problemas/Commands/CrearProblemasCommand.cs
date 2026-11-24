@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Problemas;
 using HelpDesk.Domain.Exceptions;
@@ -33,8 +32,15 @@ internal sealed class CrearProblemasCommandHandler(IUnitOfWork _unitOfWork, IAcc
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (request.IdResponsable == Guid.Empty)
+            {
+                throw new ValidationException("IdResponsable debe ser un identificador valido.");
+            }
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new global::HelpDesk.Domain.Models.Problemas()
             {
                 IdProblema = Guid.NewGuid(),
@@ -62,6 +68,10 @@ internal sealed class CrearProblemasCommandHandler(IUnitOfWork _unitOfWork, IAcc
                 SolucionDefinitiva = entity.SolucionDefinitiva,
                 FechaCreacion = entity.FechaCreacion
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<ProblemasResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.CategoriasConocimiento;
 using HelpDesk.Domain.Exceptions;
@@ -29,8 +28,11 @@ internal sealed class ActualizarCategoriasConocimientoCommandHandler(IUnitOfWork
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.CategoriasConocimiento>().GetByIdAsync(request.Keys)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
@@ -47,6 +49,10 @@ internal sealed class ActualizarCategoriasConocimientoCommandHandler(IUnitOfWork
                 Descripcion = entity.Descripcion,
                 Activo = entity.Activo
             }, "Registro actualizado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<CategoriasConocimientoResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {

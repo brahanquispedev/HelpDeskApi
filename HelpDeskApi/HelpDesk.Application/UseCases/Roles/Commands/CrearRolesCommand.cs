@@ -1,6 +1,5 @@
 using HelpDesk.Domain.Dtos.Roles;
 using System.ComponentModel.DataAnnotations;
-using HelpDesk.Application.Common;
 using HelpDesk.Application.Services.Security;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Exceptions;
@@ -25,8 +24,11 @@ internal sealed class CrearRolesCommandHandler(IUnitOfWork _unitOfWork, IAccessR
         try
         {
 
-            Validation.Check(request);
-            Validation.Require(access.Admin, "Esta operacion requiere administracion.", 403);
+            Validator.ValidateObject(request, new ValidationContext(request), validateAllProperties: true);
+            if (!(access.Admin))
+            {
+                throw new BusinessException(403, "Esta operacion requiere administracion.");
+            }
             var entity = new global::HelpDesk.Domain.Models.Roles()
             {
                 IdRol = Guid.NewGuid(),
@@ -42,6 +44,10 @@ internal sealed class CrearRolesCommandHandler(IUnitOfWork _unitOfWork, IAccessR
                 Nombre = entity.Nombre,
                 Descripcion = entity.Descripcion
             }, "Registro creado.");
+        }
+        catch (ValidationException ex)
+        {
+            return new ResponseDto<RolesResponseDto>(400, default, ex.Message);
         }
         catch (BusinessException ex)
         {
