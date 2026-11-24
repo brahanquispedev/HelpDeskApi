@@ -19,7 +19,7 @@ public class CrearComentariosCommand : IRequest<ResponseDto<ComentariosResponseD
     public bool EsInterno { get; set; }
 }
 
-internal sealed class CrearComentariosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor, TicketNotifications notices) : IRequestHandler<CrearComentariosCommand, ResponseDto<ComentariosResponseDto>>
+internal sealed class CrearComentariosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor, ITicketNotifications notices) : IRequestHandler<CrearComentariosCommand, ResponseDto<ComentariosResponseDto>>
 {
     public async Task<ResponseDto<ComentariosResponseDto>> Handle(CrearComentariosCommand request, CancellationToken ct)
     {
