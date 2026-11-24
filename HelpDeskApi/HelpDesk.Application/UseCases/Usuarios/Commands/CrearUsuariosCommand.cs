@@ -29,7 +29,7 @@ public class CrearUsuariosCommand : IRequest<ResponseDto<UsuariosResponseDto>>
     public string? Clave { get; set; }
 }
 
-internal sealed class CrearUsuariosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, IPasswordService passwords) : IRequestHandler<CrearUsuariosCommand, ResponseDto<UsuariosResponseDto>>
+internal sealed class CrearUsuariosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, IPasswordService passwords) : IRequestHandler<CrearUsuariosCommand, ResponseDto<UsuariosResponseDto>>
 {
     public async Task<ResponseDto<UsuariosResponseDto>> Handle(CrearUsuariosCommand request, CancellationToken ct)
     {

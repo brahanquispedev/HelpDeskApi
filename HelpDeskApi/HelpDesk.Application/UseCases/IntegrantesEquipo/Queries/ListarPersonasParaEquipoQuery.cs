@@ -10,7 +10,7 @@ namespace HelpDesk.Application.UseCases.IntegrantesEquipo.Queries;
 
 public sealed record ListarPersonasParaEquipoQuery : IRequest<ResponseDto<UsuarioOpcionDto[]>>;
 
-internal sealed class ListarPersonasParaEquipoHandler(IUnitOfWork unitOfWork, AccessRules access)
+internal sealed class ListarPersonasParaEquipoHandler(IUnitOfWork unitOfWork, IAccessRules access)
     : IRequestHandler<ListarPersonasParaEquipoQuery, ResponseDto<UsuarioOpcionDto[]>>
 {
     public async Task<ResponseDto<UsuarioOpcionDto[]>> Handle(ListarPersonasParaEquipoQuery request, CancellationToken ct)

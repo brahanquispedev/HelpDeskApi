@@ -16,7 +16,7 @@ public class EliminarUsuariosRolesCommand : IRequest<ResponseDto<OperacionDto>>
     public object[] Keys { get; set; } = [];
 }
 
-internal sealed class EliminarUsuariosRolesCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<EliminarUsuariosRolesCommand, ResponseDto<OperacionDto>>
+internal sealed class EliminarUsuariosRolesCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<EliminarUsuariosRolesCommand, ResponseDto<OperacionDto>>
 {
     public async Task<ResponseDto<OperacionDto>> Handle(EliminarUsuariosRolesCommand request, CancellationToken ct)
     {

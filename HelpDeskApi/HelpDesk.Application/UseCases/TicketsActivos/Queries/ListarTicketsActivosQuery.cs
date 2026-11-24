@@ -15,7 +15,7 @@ public class ListarTicketsActivosQuery : IRequest<ResponseDto<PaginaDto<TicketsA
     public int Tamano { get; set; } = 20;
 }
 
-internal sealed class ListarTicketsActivosQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarTicketsActivosQuery, ResponseDto<PaginaDto<TicketsActivosResponseDto>>>
+internal sealed class ListarTicketsActivosQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarTicketsActivosQuery, ResponseDto<PaginaDto<TicketsActivosResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<TicketsActivosResponseDto>>> Handle(ListarTicketsActivosQuery request, CancellationToken ct)
     {

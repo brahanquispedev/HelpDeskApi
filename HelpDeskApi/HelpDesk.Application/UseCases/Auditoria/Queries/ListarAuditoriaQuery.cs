@@ -16,7 +16,7 @@ public class ListarAuditoriaQuery : IRequest<ResponseDto<PaginaDto<AuditoriaResp
     public string? Buscar { get; set; }
 }
 
-internal sealed class ListarAuditoriaQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarAuditoriaQuery, ResponseDto<PaginaDto<AuditoriaResponseDto>>>
+internal sealed class ListarAuditoriaQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarAuditoriaQuery, ResponseDto<PaginaDto<AuditoriaResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<AuditoriaResponseDto>>> Handle(ListarAuditoriaQuery request, CancellationToken ct)
     {

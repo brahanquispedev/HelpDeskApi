@@ -13,7 +13,7 @@ public class ListarPreferenciasNotificacionesQuery : IRequest<ResponseDto<IEnume
     public Guid? IdUsuario { get; set; }
 }
 
-internal sealed class ListarPreferenciasNotificacionesQueryHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor)
+internal sealed class ListarPreferenciasNotificacionesQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor)
     : IRequestHandler<ListarPreferenciasNotificacionesQuery, ResponseDto<IEnumerable<PreferenciasNotificacionesResponseDto>>>
 {
     public async Task<ResponseDto<IEnumerable<PreferenciasNotificacionesResponseDto>>> Handle(ListarPreferenciasNotificacionesQuery request, CancellationToken ct)

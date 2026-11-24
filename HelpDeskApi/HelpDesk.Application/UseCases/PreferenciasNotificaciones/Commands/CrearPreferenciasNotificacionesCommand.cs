@@ -21,7 +21,7 @@ public class CrearPreferenciasNotificacionesCommand : IRequest<ResponseDto<Prefe
     public bool RecibirPorCorreo { get; set; } = true;
 }
 
-internal sealed class CrearPreferenciasNotificacionesCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor)
+internal sealed class CrearPreferenciasNotificacionesCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor)
     : IRequestHandler<CrearPreferenciasNotificacionesCommand, ResponseDto<PreferenciasNotificacionesResponseDto>>
 {
     public async Task<ResponseDto<PreferenciasNotificacionesResponseDto>> Handle(CrearPreferenciasNotificacionesCommand request, CancellationToken ct)

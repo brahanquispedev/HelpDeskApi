@@ -20,7 +20,7 @@ public class CrearEquiposSoporteCommand : IRequest<ResponseDto<EquiposSoporteRes
     public string? Descripcion { get; set; }
 }
 
-internal sealed class CrearEquiposSoporteCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class CrearEquiposSoporteCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<CrearEquiposSoporteCommand, ResponseDto<EquiposSoporteResponseDto>>
 {
     public async Task<ResponseDto<EquiposSoporteResponseDto>> Handle(CrearEquiposSoporteCommand request, CancellationToken ct)

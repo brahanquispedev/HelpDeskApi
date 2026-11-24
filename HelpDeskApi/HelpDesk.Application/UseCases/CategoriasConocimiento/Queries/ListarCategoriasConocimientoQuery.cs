@@ -16,7 +16,7 @@ public class ListarCategoriasConocimientoQuery : IRequest<ResponseDto<PaginaDto<
     public string? Buscar { get; set; }
 }
 
-internal sealed class ListarCategoriasConocimientoQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarCategoriasConocimientoQuery, ResponseDto<PaginaDto<CategoriasConocimientoResponseDto>>>
+internal sealed class ListarCategoriasConocimientoQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarCategoriasConocimientoQuery, ResponseDto<PaginaDto<CategoriasConocimientoResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<CategoriasConocimientoResponseDto>>> Handle(ListarCategoriasConocimientoQuery request, CancellationToken ct)
     {

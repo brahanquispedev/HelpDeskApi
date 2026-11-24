@@ -16,7 +16,7 @@ public class MarcarNotificacionLeidaCommand : IRequest<ResponseDto<OperacionDto>
     }
 }
 
-internal sealed class MarcarNotificacionLeidaCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor)
+internal sealed class MarcarNotificacionLeidaCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor)
     : IRequestHandler<MarcarNotificacionLeidaCommand, ResponseDto<OperacionDto>>
 {
     public async Task<ResponseDto<OperacionDto>> Handle(MarcarNotificacionLeidaCommand request, CancellationToken ct)

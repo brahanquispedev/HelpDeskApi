@@ -27,7 +27,7 @@ public class ActualizarPermisosCommand : IRequest<ResponseDto<PermisosResponseDt
     public string Descripcion { get; set; } = "";
 }
 
-internal sealed class ActualizarPermisosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ActualizarPermisosCommand, ResponseDto<PermisosResponseDto>>
+internal sealed class ActualizarPermisosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ActualizarPermisosCommand, ResponseDto<PermisosResponseDto>>
 {
     public async Task<ResponseDto<PermisosResponseDto>> Handle(ActualizarPermisosCommand request, CancellationToken ct)
     {

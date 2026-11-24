@@ -11,7 +11,7 @@ namespace HelpDesk.Application.UseCases.Tickets.Queries;
 
 public sealed record ListarTecnicosParaTicketQuery(Guid IdTicket) : IRequest<ResponseDto<UsuarioOpcionDto[]>>;
 
-internal sealed class ListarTecnicosParaTicketHandler(IUnitOfWork unitOfWork, AccessRules access)
+internal sealed class ListarTecnicosParaTicketHandler(IUnitOfWork unitOfWork, IAccessRules access)
     : IRequestHandler<ListarTecnicosParaTicketQuery, ResponseDto<UsuarioOpcionDto[]>>
 {
     public async Task<ResponseDto<UsuarioOpcionDto[]>> Handle(ListarTecnicosParaTicketQuery request, CancellationToken ct)

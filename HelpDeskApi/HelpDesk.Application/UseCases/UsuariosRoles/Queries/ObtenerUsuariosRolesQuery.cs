@@ -14,7 +14,7 @@ public class ObtenerUsuariosRolesQuery : IRequest<ResponseDto<UsuariosRolesRespo
     public Guid IdRol { get; set; }
 }
 
-internal sealed class ObtenerUsuariosRolesQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ObtenerUsuariosRolesQuery, ResponseDto<UsuariosRolesResponseDto>>
+internal sealed class ObtenerUsuariosRolesQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ObtenerUsuariosRolesQuery, ResponseDto<UsuariosRolesResponseDto>>
 {
     public async Task<ResponseDto<UsuariosRolesResponseDto>> Handle(ObtenerUsuariosRolesQuery request, CancellationToken ct)
     {

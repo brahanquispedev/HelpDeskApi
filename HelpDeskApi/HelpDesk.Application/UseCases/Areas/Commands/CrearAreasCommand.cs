@@ -19,7 +19,7 @@ public class CrearAreasCommand : IRequest<ResponseDto<AreasResponseDto>>
     public string Nombre { get; set; } = "";
 }
 
-internal sealed class CrearAreasCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class CrearAreasCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<CrearAreasCommand, ResponseDto<AreasResponseDto>>
 {
     public async Task<ResponseDto<AreasResponseDto>> Handle(CrearAreasCommand request, CancellationToken ct)

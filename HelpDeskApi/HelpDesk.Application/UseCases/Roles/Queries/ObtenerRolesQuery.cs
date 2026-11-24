@@ -12,7 +12,7 @@ public class ObtenerRolesQuery : IRequest<ResponseDto<RolesResponseDto>>
     public Guid IdRol { get; set; }
 }
 
-internal sealed class ObtenerRolesQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ObtenerRolesQuery, ResponseDto<RolesResponseDto>>
+internal sealed class ObtenerRolesQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ObtenerRolesQuery, ResponseDto<RolesResponseDto>>
 {
     public async Task<ResponseDto<RolesResponseDto>> Handle(ObtenerRolesQuery request, CancellationToken ct)
     {

@@ -10,7 +10,7 @@ using MediatR;
 namespace HelpDesk.Application.UseCases.Reportes.Queries;
 
 public record IndicadoresQuery() : IRequest<ResponseDto<IndicadoresDto>>;
-internal sealed class IndicadoresHandler(AccessRules access) : IRequestHandler<IndicadoresQuery, ResponseDto<IndicadoresDto>>
+internal sealed class IndicadoresHandler(IAccessRules access) : IRequestHandler<IndicadoresQuery, ResponseDto<IndicadoresDto>>
 {
     public async Task<ResponseDto<IndicadoresDto>> Handle(IndicadoresQuery r, CancellationToken ct)
     {

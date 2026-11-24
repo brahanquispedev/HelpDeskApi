@@ -31,7 +31,7 @@ public class ActualizarTicketsCommand : IRequest<ResponseDto<TicketsResponseDto>
     public int? Version { get; set; }
 }
 
-internal sealed class ActualizarTicketsCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor) : IRequestHandler<ActualizarTicketsCommand, ResponseDto<TicketsResponseDto>>
+internal sealed class ActualizarTicketsCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor) : IRequestHandler<ActualizarTicketsCommand, ResponseDto<TicketsResponseDto>>
 {
     public async Task<ResponseDto<TicketsResponseDto>> Handle(ActualizarTicketsCommand request, CancellationToken ct)
     {

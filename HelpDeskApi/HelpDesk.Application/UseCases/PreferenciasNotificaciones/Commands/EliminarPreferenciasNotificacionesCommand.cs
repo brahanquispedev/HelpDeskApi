@@ -18,7 +18,7 @@ public class EliminarPreferenciasNotificacionesCommand : IRequest<ResponseDto<Op
     }
 }
 
-internal sealed class EliminarPreferenciasNotificacionesCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor)
+internal sealed class EliminarPreferenciasNotificacionesCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor)
     : IRequestHandler<EliminarPreferenciasNotificacionesCommand, ResponseDto<OperacionDto>>
 {
     public async Task<ResponseDto<OperacionDto>> Handle(EliminarPreferenciasNotificacionesCommand request, CancellationToken ct)

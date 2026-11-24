@@ -14,7 +14,7 @@ public class ObtenerTicketsArticulosQuery : IRequest<ResponseDto<TicketsArticulo
     public Guid IdArticulo { get; set; }
 }
 
-internal sealed class ObtenerTicketsArticulosQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ObtenerTicketsArticulosQuery, ResponseDto<TicketsArticulosResponseDto>>
+internal sealed class ObtenerTicketsArticulosQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ObtenerTicketsArticulosQuery, ResponseDto<TicketsArticulosResponseDto>>
 {
     public async Task<ResponseDto<TicketsArticulosResponseDto>> Handle(ObtenerTicketsArticulosQuery request, CancellationToken ct)
     {

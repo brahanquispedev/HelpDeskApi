@@ -16,7 +16,7 @@ public class EliminarAreasCommand : IRequest<ResponseDto<OperacionDto>>
     }
 }
 
-internal sealed class EliminarAreasCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class EliminarAreasCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<EliminarAreasCommand, ResponseDto<OperacionDto>>
 {
     public async Task<ResponseDto<OperacionDto>> Handle(EliminarAreasCommand request, CancellationToken ct)

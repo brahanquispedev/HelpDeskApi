@@ -13,7 +13,7 @@ public class ObtenerAuditoriaQuery : IRequest<ResponseDto<AuditoriaResponseDto>>
     public Guid IdAuditoria { get; set; }
 }
 
-internal sealed class ObtenerAuditoriaQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ObtenerAuditoriaQuery, ResponseDto<AuditoriaResponseDto>>
+internal sealed class ObtenerAuditoriaQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ObtenerAuditoriaQuery, ResponseDto<AuditoriaResponseDto>>
 {
     public async Task<ResponseDto<AuditoriaResponseDto>> Handle(ObtenerAuditoriaQuery request, CancellationToken ct)
     {

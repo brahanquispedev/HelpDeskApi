@@ -14,7 +14,7 @@ public class ListarAreasQuery : IRequest<ResponseDto<IEnumerable<AreasResponseDt
     public bool? SoloActivos { get; set; }
 }
 
-internal sealed class ListarAreasQueryHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ListarAreasQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ListarAreasQuery, ResponseDto<IEnumerable<AreasResponseDto>>>
 {
     public async Task<ResponseDto<IEnumerable<AreasResponseDto>>> Handle(ListarAreasQuery request, CancellationToken ct)

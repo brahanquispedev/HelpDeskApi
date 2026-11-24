@@ -13,7 +13,7 @@ public class ListarSedesQuery : IRequest<ResponseDto<IEnumerable<SedesResponseDt
     public bool? SoloActivos { get; set; }
 }
 
-internal sealed class ListarSedesQueryHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ListarSedesQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ListarSedesQuery, ResponseDto<IEnumerable<SedesResponseDto>>>
 {
     public async Task<ResponseDto<IEnumerable<SedesResponseDto>>> Handle(ListarSedesQuery request, CancellationToken ct)

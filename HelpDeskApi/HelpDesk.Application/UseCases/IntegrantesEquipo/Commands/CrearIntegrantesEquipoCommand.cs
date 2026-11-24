@@ -15,7 +15,7 @@ public class CrearIntegrantesEquipoCommand : IRequest<ResponseDto<IntegrantesEqu
     public bool EsCoordinador { get; set; }
 }
 
-internal sealed class CrearIntegrantesEquipoCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class CrearIntegrantesEquipoCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<CrearIntegrantesEquipoCommand, ResponseDto<IntegrantesEquipoResponseDto>>
 {
     public async Task<ResponseDto<IntegrantesEquipoResponseDto>> Handle(CrearIntegrantesEquipoCommand request, CancellationToken ct)

@@ -13,7 +13,7 @@ public class ObtenerEncuestasQuery : IRequest<ResponseDto<EncuestasResponseDto>>
     public Guid IdEncuesta { get; set; }
 }
 
-internal sealed class ObtenerEncuestasQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ObtenerEncuestasQuery, ResponseDto<EncuestasResponseDto>>
+internal sealed class ObtenerEncuestasQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ObtenerEncuestasQuery, ResponseDto<EncuestasResponseDto>>
 {
     public async Task<ResponseDto<EncuestasResponseDto>> Handle(ObtenerEncuestasQuery request, CancellationToken ct)
     {

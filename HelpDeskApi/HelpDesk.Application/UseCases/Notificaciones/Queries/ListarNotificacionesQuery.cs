@@ -14,7 +14,7 @@ public class ListarNotificacionesQuery : IRequest<ResponseDto<IEnumerable<Notifi
     public bool? SoloNoLeidas { get; set; }
 }
 
-internal sealed class ListarNotificacionesQueryHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor)
+internal sealed class ListarNotificacionesQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor)
     : IRequestHandler<ListarNotificacionesQuery, ResponseDto<IEnumerable<NotificacionesResponseDto>>>
 {
     public async Task<ResponseDto<IEnumerable<NotificacionesResponseDto>>> Handle(ListarNotificacionesQuery request, CancellationToken ct)

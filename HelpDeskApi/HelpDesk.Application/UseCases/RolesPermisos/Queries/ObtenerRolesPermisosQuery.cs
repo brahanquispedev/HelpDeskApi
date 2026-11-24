@@ -13,7 +13,7 @@ public class ObtenerRolesPermisosQuery : IRequest<ResponseDto<RolesPermisosRespo
     public Guid IdPermiso { get; set; }
 }
 
-internal sealed class ObtenerRolesPermisosQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ObtenerRolesPermisosQuery, ResponseDto<RolesPermisosResponseDto>>
+internal sealed class ObtenerRolesPermisosQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ObtenerRolesPermisosQuery, ResponseDto<RolesPermisosResponseDto>>
 {
     public async Task<ResponseDto<RolesPermisosResponseDto>> Handle(ObtenerRolesPermisosQuery request, CancellationToken ct)
     {
