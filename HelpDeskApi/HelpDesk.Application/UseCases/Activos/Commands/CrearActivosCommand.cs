@@ -27,7 +27,7 @@ public class CrearActivosCommand : IRequest<ResponseDto<ActivosResponseDto>>
     public string Estado { get; set; } = "disponible";
 }
 
-internal sealed class CrearActivosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<CrearActivosCommand, ResponseDto<ActivosResponseDto>>
+internal sealed class CrearActivosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<CrearActivosCommand, ResponseDto<ActivosResponseDto>>
 {
     public async Task<ResponseDto<ActivosResponseDto>> Handle(CrearActivosCommand request, CancellationToken ct)
     {

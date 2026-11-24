@@ -33,7 +33,7 @@ public class ActualizarUsuariosCommand : IRequest<ResponseDto<UsuariosResponseDt
     public string? Clave { get; set; }
 }
 
-internal sealed class ActualizarUsuariosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, IPasswordService passwords) : IRequestHandler<ActualizarUsuariosCommand, ResponseDto<UsuariosResponseDto>>
+internal sealed class ActualizarUsuariosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, IPasswordService passwords) : IRequestHandler<ActualizarUsuariosCommand, ResponseDto<UsuariosResponseDto>>
 {
     public async Task<ResponseDto<UsuariosResponseDto>> Handle(ActualizarUsuariosCommand request, CancellationToken ct)
     {

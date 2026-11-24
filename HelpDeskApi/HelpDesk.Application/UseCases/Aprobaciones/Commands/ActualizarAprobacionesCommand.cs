@@ -24,7 +24,7 @@ public class ActualizarAprobacionesCommand : IRequest<ResponseDto<AprobacionesRe
     public string? ComentarioDecision { get; set; }
 }
 
-internal sealed class ActualizarAprobacionesCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ActualizarAprobacionesCommand, ResponseDto<AprobacionesResponseDto>>
+internal sealed class ActualizarAprobacionesCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ActualizarAprobacionesCommand, ResponseDto<AprobacionesResponseDto>>
 {
     public async Task<ResponseDto<AprobacionesResponseDto>> Handle(ActualizarAprobacionesCommand request, CancellationToken ct)
     {

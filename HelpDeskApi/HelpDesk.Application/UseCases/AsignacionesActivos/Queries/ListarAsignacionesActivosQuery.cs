@@ -14,7 +14,7 @@ public class ListarAsignacionesActivosQuery : IRequest<ResponseDto<PaginaDto<Asi
     public int Tamano { get; set; } = 20;
 }
 
-internal sealed class ListarAsignacionesActivosQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarAsignacionesActivosQuery, ResponseDto<PaginaDto<AsignacionesActivosResponseDto>>>
+internal sealed class ListarAsignacionesActivosQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarAsignacionesActivosQuery, ResponseDto<PaginaDto<AsignacionesActivosResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<AsignacionesActivosResponseDto>>> Handle(ListarAsignacionesActivosQuery request, CancellationToken ct)
     {

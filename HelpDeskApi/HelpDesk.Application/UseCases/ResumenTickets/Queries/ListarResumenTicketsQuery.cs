@@ -16,7 +16,7 @@ public class ListarResumenTicketsQuery : IRequest<ResponseDto<PaginaDto<ResumenT
     public Guid? IdTicket { get; set; }
 }
 
-internal sealed class ListarResumenTicketsQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarResumenTicketsQuery, ResponseDto<PaginaDto<ResumenTicketsResponseDto>>>
+internal sealed class ListarResumenTicketsQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarResumenTicketsQuery, ResponseDto<PaginaDto<ResumenTicketsResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<ResumenTicketsResponseDto>>> Handle(ListarResumenTicketsQuery request, CancellationToken ct)
     {

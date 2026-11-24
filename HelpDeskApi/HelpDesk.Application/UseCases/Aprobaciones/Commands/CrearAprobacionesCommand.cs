@@ -20,7 +20,7 @@ public class CrearAprobacionesCommand : IRequest<ResponseDto<AprobacionesRespons
     public string? ComentarioDecision { get; set; }
 }
 
-internal sealed class CrearAprobacionesCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor) : IRequestHandler<CrearAprobacionesCommand, ResponseDto<AprobacionesResponseDto>>
+internal sealed class CrearAprobacionesCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor) : IRequestHandler<CrearAprobacionesCommand, ResponseDto<AprobacionesResponseDto>>
 {
     public async Task<ResponseDto<AprobacionesResponseDto>> Handle(CrearAprobacionesCommand request, CancellationToken ct)
     {

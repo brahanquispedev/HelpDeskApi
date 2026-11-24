@@ -16,7 +16,7 @@ public class ListarComentariosQuery : IRequest<ResponseDto<PaginaDto<Comentarios
     public Guid? IdTicket { get; set; }
 }
 
-internal sealed class ListarComentariosQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarComentariosQuery, ResponseDto<PaginaDto<ComentariosResponseDto>>>
+internal sealed class ListarComentariosQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarComentariosQuery, ResponseDto<PaginaDto<ComentariosResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<ComentariosResponseDto>>> Handle(ListarComentariosQuery request, CancellationToken ct)
     {

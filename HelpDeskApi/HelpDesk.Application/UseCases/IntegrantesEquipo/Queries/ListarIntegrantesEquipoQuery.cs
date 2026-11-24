@@ -14,7 +14,7 @@ public class ListarIntegrantesEquipoQuery : IRequest<ResponseDto<IEnumerable<Int
     public bool? SoloActivos { get; set; }
 }
 
-internal sealed class ListarIntegrantesEquipoQueryHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ListarIntegrantesEquipoQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ListarIntegrantesEquipoQuery, ResponseDto<IEnumerable<IntegrantesEquipoResponseDto>>>
 {
     public async Task<ResponseDto<IEnumerable<IntegrantesEquipoResponseDto>>> Handle(ListarIntegrantesEquipoQuery request, CancellationToken ct)

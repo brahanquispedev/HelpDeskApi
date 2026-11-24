@@ -14,7 +14,7 @@ public class ListarProblemasTicketsQuery : IRequest<ResponseDto<PaginaDto<Proble
     public int Tamano { get; set; } = 20;
 }
 
-internal sealed class ListarProblemasTicketsQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarProblemasTicketsQuery, ResponseDto<PaginaDto<ProblemasTicketsResponseDto>>>
+internal sealed class ListarProblemasTicketsQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarProblemasTicketsQuery, ResponseDto<PaginaDto<ProblemasTicketsResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<ProblemasTicketsResponseDto>>> Handle(ListarProblemasTicketsQuery request, CancellationToken ct)
     {

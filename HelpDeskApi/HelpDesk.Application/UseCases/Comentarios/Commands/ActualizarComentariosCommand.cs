@@ -21,7 +21,7 @@ public class ActualizarComentariosCommand : IRequest<ResponseDto<ComentariosResp
     public bool EsInterno { get; set; }
 }
 
-internal sealed class ActualizarComentariosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor) : IRequestHandler<ActualizarComentariosCommand, ResponseDto<ComentariosResponseDto>>
+internal sealed class ActualizarComentariosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor) : IRequestHandler<ActualizarComentariosCommand, ResponseDto<ComentariosResponseDto>>
 {
     public async Task<ResponseDto<ComentariosResponseDto>> Handle(ActualizarComentariosCommand request, CancellationToken ct)
     {

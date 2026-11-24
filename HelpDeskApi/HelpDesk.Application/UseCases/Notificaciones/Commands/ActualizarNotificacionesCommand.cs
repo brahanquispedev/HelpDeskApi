@@ -29,7 +29,7 @@ public class ActualizarNotificacionesCommand : IRequest<ResponseDto<Notificacion
     public string TipoEvento { get; set; } = "";
 }
 
-internal sealed class ActualizarNotificacionesCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ActualizarNotificacionesCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ActualizarNotificacionesCommand, ResponseDto<NotificacionesResponseDto>>
 {
     public async Task<ResponseDto<NotificacionesResponseDto>> Handle(ActualizarNotificacionesCommand request, CancellationToken ct)

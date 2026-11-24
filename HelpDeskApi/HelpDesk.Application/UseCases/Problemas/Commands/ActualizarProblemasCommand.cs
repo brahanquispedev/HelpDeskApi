@@ -29,7 +29,7 @@ public class ActualizarProblemasCommand : IRequest<ResponseDto<ProblemasResponse
     public string? SolucionDefinitiva { get; set; }
 }
 
-internal sealed class ActualizarProblemasCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ActualizarProblemasCommand, ResponseDto<ProblemasResponseDto>>
+internal sealed class ActualizarProblemasCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ActualizarProblemasCommand, ResponseDto<ProblemasResponseDto>>
 {
     public async Task<ResponseDto<ProblemasResponseDto>> Handle(ActualizarProblemasCommand request, CancellationToken ct)
     {

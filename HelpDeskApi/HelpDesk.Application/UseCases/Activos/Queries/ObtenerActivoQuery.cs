@@ -14,7 +14,7 @@ public class ObtenerActivoQuery : IRequest<ResponseDto<ActivosResponseDto>>
     public Guid IdActivo { get; set; }
 }
 
-internal sealed class ObtenerActivoQueryHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ObtenerActivoQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ObtenerActivoQuery, ResponseDto<ActivosResponseDto>>
 {
     public async Task<ResponseDto<ActivosResponseDto>> Handle(ObtenerActivoQuery request, CancellationToken ct)

@@ -15,7 +15,7 @@ public class EliminarPermisosCommand : IRequest<ResponseDto<OperacionDto>>
     public object[] Keys { get; set; } = [];
 }
 
-internal sealed class EliminarPermisosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<EliminarPermisosCommand, ResponseDto<OperacionDto>>
+internal sealed class EliminarPermisosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<EliminarPermisosCommand, ResponseDto<OperacionDto>>
 {
     public async Task<ResponseDto<OperacionDto>> Handle(EliminarPermisosCommand request, CancellationToken ct)
     {

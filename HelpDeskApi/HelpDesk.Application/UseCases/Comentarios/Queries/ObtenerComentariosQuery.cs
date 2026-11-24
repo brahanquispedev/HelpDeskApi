@@ -12,7 +12,7 @@ public class ObtenerComentariosQuery : IRequest<ResponseDto<ComentariosResponseD
     public Guid IdComentario { get; set; }
 }
 
-internal sealed class ObtenerComentariosQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ObtenerComentariosQuery, ResponseDto<ComentariosResponseDto>>
+internal sealed class ObtenerComentariosQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ObtenerComentariosQuery, ResponseDto<ComentariosResponseDto>>
 {
     public async Task<ResponseDto<ComentariosResponseDto>> Handle(ObtenerComentariosQuery request, CancellationToken ct)
     {

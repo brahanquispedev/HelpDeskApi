@@ -32,7 +32,7 @@ public class ActualizarActivosCommand : IRequest<ResponseDto<ActivosResponseDto>
     public string Estado { get; set; } = "disponible";
 }
 
-internal sealed class ActualizarActivosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ActualizarActivosCommand, ResponseDto<ActivosResponseDto>>
+internal sealed class ActualizarActivosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ActualizarActivosCommand, ResponseDto<ActivosResponseDto>>
 {
     public async Task<ResponseDto<ActivosResponseDto>> Handle(ActualizarActivosCommand request, CancellationToken ct)
     {

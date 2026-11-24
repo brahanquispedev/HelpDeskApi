@@ -16,7 +16,7 @@ public class ListarTareasCambiosQuery : IRequest<ResponseDto<PaginaDto<TareasCam
     public string? Estado { get; set; }
 }
 
-internal sealed class ListarTareasCambiosQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarTareasCambiosQuery, ResponseDto<PaginaDto<TareasCambiosResponseDto>>>
+internal sealed class ListarTareasCambiosQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarTareasCambiosQuery, ResponseDto<PaginaDto<TareasCambiosResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<TareasCambiosResponseDto>>> Handle(ListarTareasCambiosQuery request, CancellationToken ct)
     {

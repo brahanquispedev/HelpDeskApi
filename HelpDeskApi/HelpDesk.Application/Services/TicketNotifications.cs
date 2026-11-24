@@ -6,7 +6,18 @@ namespace HelpDesk.Application.Services;
 
 internal enum TicketEvent { Created, Assigned, Started, Resolved, Closed, PublicComment }
 
-internal sealed class TicketNotifications(IUnitOfWork unitOfWork, ICurrentUser actor)
+internal interface ITicketNotifications
+{
+    Task NotifyCoordinatorsAsync(Tickets ticket, CancellationToken ct);
+    Task EnqueueAsync(
+        Tickets ticket,
+        TicketEvent kind,
+        IEnumerable<Guid?> recipients,
+        CancellationToken ct,
+        Guid? commentId = null);
+}
+
+internal sealed class TicketNotifications(IUnitOfWork unitOfWork, ICurrentUser actor) : ITicketNotifications
 {
     public async Task NotifyCoordinatorsAsync(Tickets ticket, CancellationToken ct)
     {

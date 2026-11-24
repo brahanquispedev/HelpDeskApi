@@ -24,7 +24,7 @@ public class ResolverTicketCommand : IRequest<ResponseDto<TicketsResponseDto>>
     public Guid? IdTecnico { get; set; }
 }
 
-internal sealed class ResolverTicketCommandHandler(IUnitOfWork _unitOfWork, ICurrentUser actor, AccessRules access, TicketNotifications notices)
+internal sealed class ResolverTicketCommandHandler(IUnitOfWork _unitOfWork, ICurrentUser actor, IAccessRules access, ITicketNotifications notices)
     : IRequestHandler<ResolverTicketCommand, ResponseDto<TicketsResponseDto>>
 {
     public async Task<ResponseDto<TicketsResponseDto>> Handle(ResolverTicketCommand request, CancellationToken ct)
@@ -49,6 +49,11 @@ internal sealed class ResolverTicketCommandHandler(IUnitOfWork _unitOfWork, ICur
             {
                 throw new BusinessException(409, "Debe estar en atencion.");
             }
+            if (t.IdTecnicoAsignado != actor.Id)
+            {
+                throw new BusinessException(403, "Solo el tecnico asignado puede resolver el ticket.");
+            }
+            Validation.Require(t.Estado == "en_atencion", "Debe estar en atencion.", 409);
             t.Estado = "resuelto";
             t.Solucion = request.Motivo;
             t.FechaResolucion = now;

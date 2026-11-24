@@ -23,7 +23,7 @@ public class ActualizarEquiposSoporteCommand : IRequest<ResponseDto<EquiposSopor
     public bool Activo { get; set; }
 }
 
-internal sealed class ActualizarEquiposSoporteCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ActualizarEquiposSoporteCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ActualizarEquiposSoporteCommand, ResponseDto<EquiposSoporteResponseDto>>
 {
     public async Task<ResponseDto<EquiposSoporteResponseDto>> Handle(ActualizarEquiposSoporteCommand request, CancellationToken ct)

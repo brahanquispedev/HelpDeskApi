@@ -14,7 +14,7 @@ public class ListarEnviosNotificacionesQuery : IRequest<ResponseDto<IEnumerable<
     public string? Estado { get; set; }
 }
 
-internal sealed class ListarEnviosNotificacionesQueryHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ListarEnviosNotificacionesQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ListarEnviosNotificacionesQuery, ResponseDto<IEnumerable<EnviosNotificacionesResponseDto>>>
 {
     public async Task<ResponseDto<IEnumerable<EnviosNotificacionesResponseDto>>> Handle(ListarEnviosNotificacionesQuery request, CancellationToken ct)

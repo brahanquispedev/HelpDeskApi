@@ -17,7 +17,7 @@ public class ActualizarIntegrantesEquipoCommand : IRequest<ResponseDto<Integrant
     public bool Activo { get; set; }
 }
 
-internal sealed class ActualizarIntegrantesEquipoCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ActualizarIntegrantesEquipoCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ActualizarIntegrantesEquipoCommand, ResponseDto<IntegrantesEquipoResponseDto>>
 {
     public async Task<ResponseDto<IntegrantesEquipoResponseDto>> Handle(ActualizarIntegrantesEquipoCommand request, CancellationToken ct)

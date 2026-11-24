@@ -17,7 +17,7 @@ public class ActivarUsuarioCommand : IRequest<ResponseDto<AccionResultadoDto>>
     public string Motivo { get; set; } = string.Empty;
 }
 
-internal sealed class ActivarUsuarioCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class ActivarUsuarioCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<ActivarUsuarioCommand, ResponseDto<AccionResultadoDto>>
 {
     public async Task<ResponseDto<AccionResultadoDto>> Handle(ActivarUsuarioCommand r, CancellationToken ct)

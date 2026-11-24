@@ -18,7 +18,7 @@ public class RechazarSolicitudCommand : IRequest<ResponseDto<AccionResultadoDto>
     public string Motivo { get; set; } = string.Empty;
 }
 
-internal sealed class RechazarSolicitudCommandHandler(IUnitOfWork _unitOfWork, ICurrentUser actor, AccessRules access)
+internal sealed class RechazarSolicitudCommandHandler(IUnitOfWork _unitOfWork, ICurrentUser actor, IAccessRules access)
     : IRequestHandler<RechazarSolicitudCommand, ResponseDto<AccionResultadoDto>>
 {
     public async Task<ResponseDto<AccionResultadoDto>> Handle(RechazarSolicitudCommand r, CancellationToken ct)

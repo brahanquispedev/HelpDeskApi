@@ -17,7 +17,7 @@ public class CrearCategoriasServiciosCommand : IRequest<ResponseDto<CategoriasSe
     public bool Activo { get; set; } = true;
 }
 
-internal sealed class CrearCategoriasServiciosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<CrearCategoriasServiciosCommand, ResponseDto<CategoriasServiciosResponseDto>>
+internal sealed class CrearCategoriasServiciosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<CrearCategoriasServiciosCommand, ResponseDto<CategoriasServiciosResponseDto>>
 {
     public async Task<ResponseDto<CategoriasServiciosResponseDto>> Handle(CrearCategoriasServiciosCommand request, CancellationToken ct)
     {

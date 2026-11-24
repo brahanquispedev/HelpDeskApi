@@ -18,7 +18,7 @@ public class ActualizarUsuariosRolesCommand : IRequest<ResponseDto<UsuariosRoles
     public Guid IdRol { get; set; }
 }
 
-internal sealed class ActualizarUsuariosRolesCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ActualizarUsuariosRolesCommand, ResponseDto<UsuariosRolesResponseDto>>
+internal sealed class ActualizarUsuariosRolesCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ActualizarUsuariosRolesCommand, ResponseDto<UsuariosRolesResponseDto>>
 {
     public async Task<ResponseDto<UsuariosRolesResponseDto>> Handle(ActualizarUsuariosRolesCommand request, CancellationToken ct)
     {

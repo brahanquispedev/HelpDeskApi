@@ -22,7 +22,7 @@ public class CrearPermisosCommand : IRequest<ResponseDto<PermisosResponseDto>>
     public string Descripcion { get; set; } = "";
 }
 
-internal sealed class CrearPermisosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<CrearPermisosCommand, ResponseDto<PermisosResponseDto>>
+internal sealed class CrearPermisosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<CrearPermisosCommand, ResponseDto<PermisosResponseDto>>
 {
     public async Task<ResponseDto<PermisosResponseDto>> Handle(CrearPermisosCommand request, CancellationToken ct)
     {

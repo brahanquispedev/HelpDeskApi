@@ -14,7 +14,7 @@ public class ListarRecuperacionesClaveQuery : IRequest<ResponseDto<PaginaDto<Rec
     public int Tamano { get; set; } = 20;
 }
 
-internal sealed class ListarRecuperacionesClaveQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarRecuperacionesClaveQuery, ResponseDto<PaginaDto<RecuperacionesClaveResponseDto>>>
+internal sealed class ListarRecuperacionesClaveQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarRecuperacionesClaveQuery, ResponseDto<PaginaDto<RecuperacionesClaveResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<RecuperacionesClaveResponseDto>>> Handle(ListarRecuperacionesClaveQuery request, CancellationToken ct)
     {

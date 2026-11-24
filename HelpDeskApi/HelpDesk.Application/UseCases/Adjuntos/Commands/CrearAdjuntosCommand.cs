@@ -23,7 +23,7 @@ public class CrearAdjuntosCommand : IRequest<ResponseDto<AdjuntosResponseDto>>
     public bool EsInterno { get; set; }
 }
 
-internal sealed class CrearAdjuntosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor) : IRequestHandler<CrearAdjuntosCommand, ResponseDto<AdjuntosResponseDto>>
+internal sealed class CrearAdjuntosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor) : IRequestHandler<CrearAdjuntosCommand, ResponseDto<AdjuntosResponseDto>>
 {
     public async Task<ResponseDto<AdjuntosResponseDto>> Handle(CrearAdjuntosCommand request, CancellationToken ct)
     {

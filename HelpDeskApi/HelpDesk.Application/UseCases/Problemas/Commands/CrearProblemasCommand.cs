@@ -25,7 +25,7 @@ public class CrearProblemasCommand : IRequest<ResponseDto<ProblemasResponseDto>>
     public string? SolucionDefinitiva { get; set; }
 }
 
-internal sealed class CrearProblemasCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<CrearProblemasCommand, ResponseDto<ProblemasResponseDto>>
+internal sealed class CrearProblemasCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<CrearProblemasCommand, ResponseDto<ProblemasResponseDto>>
 {
     public async Task<ResponseDto<ProblemasResponseDto>> Handle(CrearProblemasCommand request, CancellationToken ct)
     {

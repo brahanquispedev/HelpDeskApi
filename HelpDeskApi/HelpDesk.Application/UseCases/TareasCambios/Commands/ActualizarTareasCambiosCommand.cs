@@ -26,7 +26,7 @@ public class ActualizarTareasCambiosCommand : IRequest<ResponseDto<TareasCambios
     public string Estado { get; set; } = "pendiente";
 }
 
-internal sealed class ActualizarTareasCambiosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ActualizarTareasCambiosCommand, ResponseDto<TareasCambiosResponseDto>>
+internal sealed class ActualizarTareasCambiosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ActualizarTareasCambiosCommand, ResponseDto<TareasCambiosResponseDto>>
 {
     public async Task<ResponseDto<TareasCambiosResponseDto>> Handle(ActualizarTareasCambiosCommand request, CancellationToken ct)
     {

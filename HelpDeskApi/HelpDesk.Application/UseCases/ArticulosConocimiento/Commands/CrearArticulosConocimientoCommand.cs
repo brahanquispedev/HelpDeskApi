@@ -20,7 +20,7 @@ public class CrearArticulosConocimientoCommand : IRequest<ResponseDto<ArticulosC
     public bool EsInterno { get; set; }
 }
 
-internal sealed class CrearArticulosConocimientoCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor) : IRequestHandler<CrearArticulosConocimientoCommand, ResponseDto<ArticulosConocimientoResponseDto>>
+internal sealed class CrearArticulosConocimientoCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor) : IRequestHandler<CrearArticulosConocimientoCommand, ResponseDto<ArticulosConocimientoResponseDto>>
 {
     public async Task<ResponseDto<ArticulosConocimientoResponseDto>> Handle(CrearArticulosConocimientoCommand request, CancellationToken ct)
     {

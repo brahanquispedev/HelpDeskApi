@@ -21,7 +21,7 @@ public class CambiarEstadoActivoCommand : IRequest<ResponseDto<ActivosResponseDt
     public string Estado { get; set; } = string.Empty;
 }
 
-internal sealed class CambiarEstadoActivoCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class CambiarEstadoActivoCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<CambiarEstadoActivoCommand, ResponseDto<ActivosResponseDto>>
 {
     public async Task<ResponseDto<ActivosResponseDto>> Handle(CambiarEstadoActivoCommand request, CancellationToken ct)

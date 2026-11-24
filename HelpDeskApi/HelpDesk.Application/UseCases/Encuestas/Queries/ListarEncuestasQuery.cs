@@ -15,7 +15,7 @@ public class ListarEncuestasQuery : IRequest<ResponseDto<PaginaDto<EncuestasResp
     public Guid? IdTicket { get; set; }
 }
 
-internal sealed class ListarEncuestasQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarEncuestasQuery, ResponseDto<PaginaDto<EncuestasResponseDto>>>
+internal sealed class ListarEncuestasQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarEncuestasQuery, ResponseDto<PaginaDto<EncuestasResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<EncuestasResponseDto>>> Handle(ListarEncuestasQuery request, CancellationToken ct)
     {

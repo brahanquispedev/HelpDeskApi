@@ -19,7 +19,7 @@ public class ActualizarTicketsArticulosCommand : IRequest<ResponseDto<TicketsArt
     public Guid IdUsuario { get; set; }
 }
 
-internal sealed class ActualizarTicketsArticulosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor) : IRequestHandler<ActualizarTicketsArticulosCommand, ResponseDto<TicketsArticulosResponseDto>>
+internal sealed class ActualizarTicketsArticulosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor) : IRequestHandler<ActualizarTicketsArticulosCommand, ResponseDto<TicketsArticulosResponseDto>>
 {
     public async Task<ResponseDto<TicketsArticulosResponseDto>> Handle(ActualizarTicketsArticulosCommand request, CancellationToken ct)
     {

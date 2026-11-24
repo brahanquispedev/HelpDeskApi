@@ -12,7 +12,7 @@ public class ObtenerPoliticasAtencionQuery : IRequest<ResponseDto<PoliticasAtenc
     public Guid IdPolitica { get; set; }
 }
 
-internal sealed class ObtenerPoliticasAtencionQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ObtenerPoliticasAtencionQuery, ResponseDto<PoliticasAtencionResponseDto>>
+internal sealed class ObtenerPoliticasAtencionQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ObtenerPoliticasAtencionQuery, ResponseDto<PoliticasAtencionResponseDto>>
 {
     public async Task<ResponseDto<PoliticasAtencionResponseDto>> Handle(ObtenerPoliticasAtencionQuery request, CancellationToken ct)
     {

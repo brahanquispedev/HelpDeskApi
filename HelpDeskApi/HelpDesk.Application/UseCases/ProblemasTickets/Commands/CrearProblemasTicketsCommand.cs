@@ -14,7 +14,7 @@ public class CrearProblemasTicketsCommand : IRequest<ResponseDto<ProblemasTicket
     public Guid IdTicket { get; set; }
 }
 
-internal sealed class CrearProblemasTicketsCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<CrearProblemasTicketsCommand, ResponseDto<ProblemasTicketsResponseDto>>
+internal sealed class CrearProblemasTicketsCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<CrearProblemasTicketsCommand, ResponseDto<ProblemasTicketsResponseDto>>
 {
     public async Task<ResponseDto<ProblemasTicketsResponseDto>> Handle(CrearProblemasTicketsCommand request, CancellationToken ct)
     {

@@ -14,7 +14,7 @@ public class ListarRolesPermisosQuery : IRequest<ResponseDto<PaginaDto<RolesPerm
     public int Tamano { get; set; } = 20;
 }
 
-internal sealed class ListarRolesPermisosQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarRolesPermisosQuery, ResponseDto<PaginaDto<RolesPermisosResponseDto>>>
+internal sealed class ListarRolesPermisosQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarRolesPermisosQuery, ResponseDto<PaginaDto<RolesPermisosResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<RolesPermisosResponseDto>>> Handle(ListarRolesPermisosQuery request, CancellationToken ct)
     {

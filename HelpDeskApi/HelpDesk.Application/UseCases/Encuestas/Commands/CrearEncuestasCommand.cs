@@ -15,7 +15,7 @@ public class CrearEncuestasCommand : IRequest<ResponseDto<EncuestasResponseDto>>
     public string? Comentario { get; set; }
 }
 
-internal sealed class CrearEncuestasCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor) : IRequestHandler<CrearEncuestasCommand, ResponseDto<EncuestasResponseDto>>
+internal sealed class CrearEncuestasCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor) : IRequestHandler<CrearEncuestasCommand, ResponseDto<EncuestasResponseDto>>
 {
     public async Task<ResponseDto<EncuestasResponseDto>> Handle(CrearEncuestasCommand request, CancellationToken ct)
     {

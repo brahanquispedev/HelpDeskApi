@@ -16,7 +16,7 @@ public class ListarPermisosQuery : IRequest<ResponseDto<PaginaDto<PermisosRespon
     public string? Buscar { get; set; }
 }
 
-internal sealed class ListarPermisosQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ListarPermisosQuery, ResponseDto<PaginaDto<PermisosResponseDto>>>
+internal sealed class ListarPermisosQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ListarPermisosQuery, ResponseDto<PaginaDto<PermisosResponseDto>>>
 {
     public async Task<ResponseDto<PaginaDto<PermisosResponseDto>>> Handle(ListarPermisosQuery request, CancellationToken ct)
     {

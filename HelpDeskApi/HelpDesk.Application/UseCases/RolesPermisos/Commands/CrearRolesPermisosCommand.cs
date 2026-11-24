@@ -14,7 +14,7 @@ public class CrearRolesPermisosCommand : IRequest<ResponseDto<RolesPermisosRespo
     public Guid IdPermiso { get; set; }
 }
 
-internal sealed class CrearRolesPermisosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<CrearRolesPermisosCommand, ResponseDto<RolesPermisosResponseDto>>
+internal sealed class CrearRolesPermisosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<CrearRolesPermisosCommand, ResponseDto<RolesPermisosResponseDto>>
 {
     public async Task<ResponseDto<RolesPermisosResponseDto>> Handle(CrearRolesPermisosCommand request, CancellationToken ct)
     {

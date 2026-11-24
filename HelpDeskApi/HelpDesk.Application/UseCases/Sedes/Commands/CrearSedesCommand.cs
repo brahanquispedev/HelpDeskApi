@@ -19,7 +19,7 @@ public class CrearSedesCommand : IRequest<ResponseDto<SedesResponseDto>>
     public string? Direccion { get; set; }
 }
 
-internal sealed class CrearSedesCommandHandler(IUnitOfWork _unitOfWork, AccessRules access)
+internal sealed class CrearSedesCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access)
     : IRequestHandler<CrearSedesCommand, ResponseDto<SedesResponseDto>>
 {
     public async Task<ResponseDto<SedesResponseDto>> Handle(CrearSedesCommand request, CancellationToken ct)

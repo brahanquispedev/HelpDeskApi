@@ -23,7 +23,7 @@ public class ActualizarPreferenciasNotificacionesCommand : IRequest<ResponseDto<
     public bool RecibirPorCorreo { get; set; }
 }
 
-internal sealed class ActualizarPreferenciasNotificacionesCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor)
+internal sealed class ActualizarPreferenciasNotificacionesCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor)
     : IRequestHandler<ActualizarPreferenciasNotificacionesCommand, ResponseDto<PreferenciasNotificacionesResponseDto>>
 {
     public async Task<ResponseDto<PreferenciasNotificacionesResponseDto>> Handle(ActualizarPreferenciasNotificacionesCommand request, CancellationToken ct)

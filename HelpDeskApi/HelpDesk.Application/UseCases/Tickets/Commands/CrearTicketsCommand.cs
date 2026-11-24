@@ -28,7 +28,7 @@ public class CrearTicketsCommand : IRequest<ResponseDto<TicketsResponseDto>>
     public int? Version { get; set; }
 }
 
-internal sealed class CrearTicketsCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor, TicketNotifications notices) : IRequestHandler<CrearTicketsCommand, ResponseDto<TicketsResponseDto>>
+internal sealed class CrearTicketsCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor, ITicketNotifications notices) : IRequestHandler<CrearTicketsCommand, ResponseDto<TicketsResponseDto>>
 {
     public async Task<ResponseDto<TicketsResponseDto>> Handle(CrearTicketsCommand request, CancellationToken ct)
     {

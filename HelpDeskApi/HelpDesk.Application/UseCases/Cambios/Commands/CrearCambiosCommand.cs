@@ -31,7 +31,7 @@ public class CrearCambiosCommand : IRequest<ResponseDto<CambiosResponseDto>>
     public string? Resultado { get; set; }
 }
 
-internal sealed class CrearCambiosCommandHandler(IUnitOfWork _unitOfWork, AccessRules access, ICurrentUser actor) : IRequestHandler<CrearCambiosCommand, ResponseDto<CambiosResponseDto>>
+internal sealed class CrearCambiosCommandHandler(IUnitOfWork _unitOfWork, IAccessRules access, ICurrentUser actor) : IRequestHandler<CrearCambiosCommand, ResponseDto<CambiosResponseDto>>
 {
     public async Task<ResponseDto<CambiosResponseDto>> Handle(CrearCambiosCommand request, CancellationToken ct)
     {

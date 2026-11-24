@@ -12,7 +12,7 @@ public class ObtenerCambiosQuery : IRequest<ResponseDto<CambiosResponseDto>>
     public Guid IdCambio { get; set; }
 }
 
-internal sealed class ObtenerCambiosQueryHandler(IUnitOfWork _unitOfWork, AccessRules access) : IRequestHandler<ObtenerCambiosQuery, ResponseDto<CambiosResponseDto>>
+internal sealed class ObtenerCambiosQueryHandler(IUnitOfWork _unitOfWork, IAccessRules access) : IRequestHandler<ObtenerCambiosQuery, ResponseDto<CambiosResponseDto>>
 {
     public async Task<ResponseDto<CambiosResponseDto>> Handle(ObtenerCambiosQuery request, CancellationToken ct)
     {
