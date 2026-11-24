@@ -53,7 +53,6 @@ internal sealed class IniciarTicketCommandHandler(IUnitOfWork _unitOfWork, ICurr
             {
                 throw new BusinessException(403, "Solo el tecnico asignado puede iniciar la atencion.");
             }
-            Validation.Require(t.Estado == "asignado", "Debe estar asignado.", 409);
             t.Estado = "en_atencion";
             t.FechaPrimeraRespuesta ??= now;
             await History(t, "iniciar", before, t.Estado, request.Motivo);
