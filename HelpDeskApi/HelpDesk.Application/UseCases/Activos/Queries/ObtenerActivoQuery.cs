@@ -22,7 +22,7 @@ internal sealed class ObtenerActivoQueryHandler(IUnitOfWork _unitOfWork, IAccess
         try
         {
             var entity = await _unitOfWork.Repository<ActivoEntity>().GetByIdAsync([request.IdActivo])
-                ?? throw new BusinessException(404, "Activo no encontrado.");
+                         ?? throw new BusinessException(404, "Activo no encontrado.");
 
             access.EnsureRead(entity);
 
