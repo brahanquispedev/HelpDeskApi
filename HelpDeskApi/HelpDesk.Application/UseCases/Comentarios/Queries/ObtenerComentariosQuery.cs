@@ -5,6 +5,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 namespace HelpDesk.Application.UseCases.Comentarios.Queries;
 
 public class ObtenerComentariosQuery : IRequest<ResponseDto<ComentariosResponseDto>>
@@ -18,7 +19,10 @@ internal sealed class ObtenerComentariosQueryHandler(IUnitOfWork _unitOfWork, IA
     {
         try
         {
-            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Comentarios>().GetByIdAsync(request.IdComentario)
+            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Comentarios>()
+                         .Query()
+                         .AsNoTracking()
+                         .FirstOrDefaultAsync(x => x.IdComentario == request.IdComentario)
                          ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
             return new ResponseDto<ComentariosResponseDto>(200, new ComentariosResponseDto
