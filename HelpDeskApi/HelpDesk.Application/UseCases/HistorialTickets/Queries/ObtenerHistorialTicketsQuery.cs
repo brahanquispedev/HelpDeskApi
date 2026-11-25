@@ -5,6 +5,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 namespace HelpDesk.Application.UseCases.HistorialTickets.Queries;
 
 public class ObtenerHistorialTicketsQuery : IRequest<ResponseDto<HistorialTicketsResponseDto>>
@@ -18,7 +19,10 @@ internal sealed class ObtenerHistorialTicketsQueryHandler(IUnitOfWork _unitOfWor
     {
         try
         {
-            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.HistorialTickets>().GetByIdAsync(request.IdHistorial)
+            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.HistorialTickets>()
+                .Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.IdHistorial == request.IdHistorial)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
             return new ResponseDto<HistorialTicketsResponseDto>(200, new HistorialTicketsResponseDto
