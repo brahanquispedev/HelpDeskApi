@@ -5,6 +5,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 namespace HelpDesk.Application.UseCases.AsignacionesActivos.Queries;
 
 public class ObtenerAsignacionesActivosQuery : IRequest<ResponseDto<AsignacionesActivosResponseDto>>
@@ -18,7 +19,10 @@ internal sealed class ObtenerAsignacionesActivosQueryHandler(IUnitOfWork _unitOf
     {
         try
         {
-            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesActivos>().GetByIdAsync(request.IdAsignacion)
+            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.AsignacionesActivos>()
+            .Query()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.IdAsignacion == request.IdAsignacion)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
             return new ResponseDto<AsignacionesActivosResponseDto>(200, new AsignacionesActivosResponseDto

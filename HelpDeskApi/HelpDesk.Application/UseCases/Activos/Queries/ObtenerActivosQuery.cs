@@ -5,6 +5,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 namespace HelpDesk.Application.UseCases.Activos.Queries;
 
 public class ObtenerActivosQuery : IRequest<ResponseDto<ActivosResponseDto>>
@@ -18,7 +19,10 @@ internal sealed class ObtenerActivosQueryHandler(IUnitOfWork _unitOfWork, IAcces
     {
         try
         {
-            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Activos>().GetByIdAsync(request.IdActivo)
+            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Activos>()
+                         .Query()
+                         .AsNoTracking()
+                         .FirstOrDefaultAsync(x => x.IdActivo == request.IdActivo)
                          ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
             return new ResponseDto<ActivosResponseDto>(200, new ActivosResponseDto
