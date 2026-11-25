@@ -5,6 +5,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 namespace HelpDesk.Application.UseCases.Cambios.Queries;
 
 public class ObtenerCambiosQuery : IRequest<ResponseDto<CambiosResponseDto>>
@@ -18,7 +19,10 @@ internal sealed class ObtenerCambiosQueryHandler(IUnitOfWork _unitOfWork, IAcces
     {
         try
         {
-            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Cambios>().GetByIdAsync(request.IdCambio)
+            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.Cambios>()
+                .Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.IdCambio == request.IdCambio)
             ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
             return new ResponseDto<CambiosResponseDto>(200, new CambiosResponseDto
