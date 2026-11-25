@@ -5,6 +5,7 @@ using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 namespace HelpDesk.Application.UseCases.CategoriasConocimiento.Queries;
 
 public class ObtenerCategoriasConocimientoQuery : IRequest<ResponseDto<CategoriasConocimientoResponseDto>>
@@ -18,7 +19,10 @@ internal sealed class ObtenerCategoriasConocimientoQueryHandler(IUnitOfWork _uni
     {
         try
         {
-            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.CategoriasConocimiento>().GetByIdAsync(request.IdCategoriaConocimiento)
+            var entity = await _unitOfWork.Repository<global::HelpDesk.Domain.Models.CategoriasConocimiento>()
+                         .Query()
+                         .AsNoTracking()
+                         .FirstOrDefaultAsync(x => x.IdCategoriaConocimiento == request.IdCategoriaConocimiento)
                          ?? throw new BusinessException(404, "Registro no encontrado.");
             access.EnsureRead(entity);
             return new ResponseDto<CategoriasConocimientoResponseDto>(200, new CategoriasConocimientoResponseDto
