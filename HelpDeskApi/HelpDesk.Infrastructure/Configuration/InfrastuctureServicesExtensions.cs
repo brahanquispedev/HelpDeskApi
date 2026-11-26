@@ -65,7 +65,9 @@ public static class InfrastructureServicesExtensions
         services.AddScoped<ITokenService, JwtService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITicketNotifications, TicketNotifications>();
+        services.AddHttpContextAccessor();
         services.AddScoped<IAccessRules, AccessRules>();
+        services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddAuthorization(); return services;
     }
 }

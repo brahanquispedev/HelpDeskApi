@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
-using HelpDesk.Domain.Ports;
-namespace HelpDesk.Application.Services.Security;
+using HelpDesk.Application.Interfaces;
+namespace HelpDesk.Infrastructure.Services;
 
 public sealed class CurrentUser(IHttpContextAccessor _httpContextAccessor) : ICurrentUser
 {
