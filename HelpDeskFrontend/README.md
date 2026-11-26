@@ -21,7 +21,7 @@ npm run dev
 
 Abre [el frontend local](http://localhost:5173). Usa una cuenta real de desarrollo. La API por defecto es `http://localhost:5086`. Si cambia, copia `.env.example` a `.env.local` y ajusta `VITE_API_BASE_URL`. El backend debe permitir el origen exacto del frontend mediante `Cors:AllowedOrigins`.
 
-El JWT se mantiene en memoria. Si recargas la página, vuelve a ingresar. El frontend muestra los errores que devuelve la API. La versión actual del ticket se envía con cada acción y, si hay un conflicto, puedes recargar el detalle antes de continuar.
+La pestaña conserva el JWT en sessionStorage. Al recargar, el frontend consulta la sesión con la API antes de mostrar la ruta protegida. El frontend muestra los errores que devuelve la API. La versión actual del ticket se envía con cada acción y, si hay un conflicto, puedes recargar el detalle antes de continuar.
 
 ## Preparar el recorrido
 
@@ -96,8 +96,7 @@ No subir `node_modules`, `dist`, archivos `.env.local`, contraseñas o tokens.
 Antes de abrir acceso público, resolver la política del registro de empleados,
 cambiar las credenciales temporales utilizadas durante desarrollo y comprobar
 login, permisos y el ciclo completo de un ticket contra la API desplegada.
-En la versión actual el JWT se mantiene en memoria; recargar la página exige
-iniciar sesión otra vez. No está implementada la recuperación por correo.
+No está implementada la recuperación por correo.
 
 Referencias: [despliegue estático de Vite](https://vite.dev/guide/static-deploy.html)
 y [variables de entorno en Vite](https://vite.dev/guide/env-and-mode.html).
