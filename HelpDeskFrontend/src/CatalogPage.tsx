@@ -128,7 +128,7 @@ function CatalogPage({ config }: { config: Catalog }) {
           body.idComentario = editor.row.idComentario
           if (!can(session, 'comentarios.internos')) body.esInterno = editor.row.esInterno
         }
-        if ((config.slug === 'aprobaciones') && Boolean(body.idTicket) === Boolean(body.idCambio)) throw new Error('Selecciona un ticket o un cambio.')
+        if (config.slug === 'aprobaciones' && !editor.action && Boolean(body.idTicket) === Boolean(body.idCambio)) throw new Error('Selecciona un ticket o un cambio.')
         if (config.slug === 'politicas' && Number(body.minutosResolucion) < Number(body.minutosPrimeraRespuesta)) throw new Error('El plazo de resolución debe ser igual o mayor al de primera respuesta.')
         await call(editor.action ? `${path}/${editor.action.suffix}` : path, { method: editor.action || !editor.row ? 'POST' : 'PUT', body })
       }
