@@ -1,3 +1,4 @@
+using HelpDesk.Application.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text;

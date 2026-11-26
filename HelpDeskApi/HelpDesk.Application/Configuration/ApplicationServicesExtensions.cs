@@ -15,7 +15,6 @@ public static class ApplicationServicesExtensions
         services.AddScoped<IAccessRules, AccessRules>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITicketNotifications, TicketNotifications>();
-        services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<ITokenService, JwtService>();
         return services;
     }

@@ -1,3 +1,4 @@
+using HelpDesk.Application.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Application.Services.Security;
