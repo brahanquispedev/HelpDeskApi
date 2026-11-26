@@ -1,23 +1,11 @@
+using HelpDesk.Application.Interfaces;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
 using Microsoft.EntityFrameworkCore;
 
-namespace HelpDesk.Application.Services;
+namespace HelpDesk.Infrastructure.Services;
 
-internal enum TicketEvent { Created, Assigned, Started, Resolved, Closed, PublicComment }
-
-internal interface ITicketNotifications
-{
-    Task NotifyCoordinatorsAsync(Tickets ticket, CancellationToken ct);
-    Task EnqueueAsync(
-        Tickets ticket,
-        TicketEvent kind,
-        IEnumerable<Guid?> recipients,
-        CancellationToken ct,
-        Guid? commentId = null);
-}
-
-internal sealed class TicketNotifications(IUnitOfWork unitOfWork, ICurrentUser actor) : ITicketNotifications
+public sealed class TicketNotifications(IUnitOfWork unitOfWork, ICurrentUser actor) : ITicketNotifications
 {
     public async Task NotifyCoordinatorsAsync(Tickets ticket, CancellationToken ct)
     {

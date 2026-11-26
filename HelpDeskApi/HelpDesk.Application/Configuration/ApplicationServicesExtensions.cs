@@ -1,5 +1,4 @@
 using HelpDesk.Application.Services.Security;
-using HelpDesk.Application.Services;
 using HelpDesk.Domain.Ports;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +12,6 @@ public static class ApplicationServicesExtensions
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddScoped<IAccessRules, AccessRules>();
-        services.AddScoped<ITicketNotifications, TicketNotifications>();
         return services;
     }
 }
