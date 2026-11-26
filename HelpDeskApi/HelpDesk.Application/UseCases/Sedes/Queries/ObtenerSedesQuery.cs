@@ -4,6 +4,7 @@ using HelpDesk.Domain.Dtos.Sedes;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Ports;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace HelpDesk.Application.UseCases.Sedes.Queries;
 
@@ -26,7 +27,10 @@ internal sealed class ObtenerSedesQueryHandler(IUnitOfWork _unitOfWork, IAccessR
         {
 
 
-            var sede = await _unitOfWork.Repository<Domain.Models.Sedes>().GetByIdAsync([request.IdSede]);
+            var sede = await _unitOfWork.Repository<Domain.Models.Sedes>()
+                .Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.IdSede == request.IdSede);
             if (sede == null)
             {
                 throw new BusinessException(404, "Sede no encontrada.");

@@ -4,6 +4,7 @@ using HelpDesk.Domain.Dtos.EquiposSoporte;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Ports;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace HelpDesk.Application.UseCases.EquiposSoporte.Queries;
 
@@ -26,7 +27,10 @@ internal sealed class ObtenerEquiposSoporteQueryHandler(IUnitOfWork _unitOfWork,
         {
 
 
-            var equipo = await _unitOfWork.Repository<Domain.Models.EquiposSoporte>().GetByIdAsync([request.IdEquipo]);
+            var equipo = await _unitOfWork.Repository<Domain.Models.EquiposSoporte>()
+                .Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.IdEquipo == request.IdEquipo);
             if (equipo == null)
             {
                 throw new BusinessException(404, "Equipo de soporte no encontrado.");
