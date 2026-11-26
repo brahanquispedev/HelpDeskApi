@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using HelpDesk.Api.Configuration;
 using HelpDesk.Application.Configuration;
 using HelpDesk.Infrastructure.Configuration;
-using HelpDesk.Application.Services;
+using HelpDesk.Application.Interfaces;
 using HelpDesk.Domain.Dtos.Autenticacion;
 using HelpDesk.Domain.Exceptions;
 
