@@ -1,20 +1,9 @@
+using HelpDesk.Application.Interfaces;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Ports;
-namespace HelpDesk.Application.Services.Security;
+namespace HelpDesk.Infrastructure.Services;
 
-public interface IAccessRules
-{
-    bool Admin { get; }
-    Guid UserId { get; }
-    bool Internal { get; }
-    void Permission(string code);
-    IQueryable<Tickets> TicketsScope();
-    IQueryable<T> Scope<T>(IQueryable<T> query) where T : class;
-    void EnsureRead<T>(T entity) where T : class;
-    void EnsureWrite(string name, string operation);
-    void EnsureWork(Tickets ticket);
-}
 
 public sealed class AccessRules(IUnitOfWork _unitOfWork, ICurrentUser actor) : IAccessRules
 {

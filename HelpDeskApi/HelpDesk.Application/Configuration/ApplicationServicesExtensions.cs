@@ -11,7 +11,6 @@ public static class ApplicationServicesExtensions
         services.AddMediatR(typeof(ApplicationServicesExtensions).Assembly);
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
-        services.AddScoped<IAccessRules, AccessRules>();
         return services;
     }
 }

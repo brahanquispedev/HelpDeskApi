@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;
-using HelpDesk.Application.Services.Security;
+using HelpDesk.Application.Interfaces;
 using HelpDesk.Domain.Dtos.Cambios;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Models;
