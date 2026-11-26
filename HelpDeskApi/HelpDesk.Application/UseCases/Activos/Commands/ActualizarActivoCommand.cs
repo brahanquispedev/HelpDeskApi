@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using HelpDesk.Application.Services.Security;
+using HelpDesk.Application.Interfaces;
 using HelpDesk.Domain.Dtos.Activos;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Exceptions;

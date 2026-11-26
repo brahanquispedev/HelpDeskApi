@@ -1,4 +1,4 @@
-namespace HelpDesk.Domain.Ports;
+namespace HelpDesk.Application.Interfaces;
 
 public interface ICurrentUser
 {

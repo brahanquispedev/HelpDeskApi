@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using HelpDesk.Application.Services.Security;
+using HelpDesk.Application.Interfaces;
 using HelpDesk.Domain.Dtos.Common;
 using HelpDesk.Domain.Dtos.Sedes;
 using HelpDesk.Domain.Exceptions;
