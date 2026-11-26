@@ -13,7 +13,6 @@ public static class ApplicationServicesExtensions
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddScoped<IAccessRules, AccessRules>();
-        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITicketNotifications, TicketNotifications>();
         return services;
     }

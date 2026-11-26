@@ -6,12 +6,7 @@ using HelpDesk.Domain.Models;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Ports;
 
-namespace HelpDesk.Application.Services;
-
-public interface IAuthService
-{
-    Task Bootstrap(RegistroDto input);
-}
+namespace HelpDesk.Infrastructure.Services;
 
 public sealed class AuthService(IUnitOfWork _unitOfWork, IPasswordService passwords) : IAuthService
 {
