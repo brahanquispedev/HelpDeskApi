@@ -32,6 +32,7 @@ internal sealed class ListarEquiposSoporteQueryHandler(IUnitOfWork _unitOfWork, 
 
             var items = await query
                 .OrderBy(e => e.Nombre)
+                .ThenBy(e => e.IdEquipo)
                 .Select(e => new EquiposSoporteResponseDto
                 {
                     IdEquipo = e.IdEquipo,

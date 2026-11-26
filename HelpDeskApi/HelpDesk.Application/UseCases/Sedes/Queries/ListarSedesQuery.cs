@@ -32,6 +32,7 @@ internal sealed class ListarSedesQueryHandler(IUnitOfWork _unitOfWork, IAccessRu
 
             var items = await query
                 .OrderBy(s => s.Nombre)
+                .ThenBy(s => s.IdSede)
                 .Select(s => new SedesResponseDto
                 {
                     IdSede = s.IdSede,

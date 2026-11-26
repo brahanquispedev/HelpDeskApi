@@ -4,6 +4,7 @@ using HelpDesk.Domain.Dtos.IntegrantesEquipo;
 using HelpDesk.Domain.Exceptions;
 using HelpDesk.Domain.Ports;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace HelpDesk.Application.UseCases.IntegrantesEquipo.Queries;
 
@@ -28,7 +29,10 @@ internal sealed class ObtenerIntegrantesEquipoQueryHandler(IUnitOfWork _unitOfWo
         {
             if (!access.Admin) access.Permission("organizacion.administrar");
 
-            var integrante = await _unitOfWork.Repository<Domain.Models.IntegrantesEquipo>().GetByIdAsync([request.IdEquipo, request.IdUsuario]);
+            var integrante = await _unitOfWork.Repository<Domain.Models.IntegrantesEquipo>()
+                .Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.IdEquipo == request.IdEquipo && x.IdUsuario == request.IdUsuario);
             if (integrante == null)
             {
                 throw new BusinessException(404, "Integrante de equipo no encontrado.");
