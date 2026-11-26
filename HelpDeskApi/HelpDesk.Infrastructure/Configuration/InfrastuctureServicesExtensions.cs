@@ -1,7 +1,9 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using HelpDesk.Application.Interfaces;
 using HelpDesk.Domain.Ports;
+using HelpDesk.Infrastructure.Services;
 using HelpDesk.Infrastructure.Data;
 using HelpDesk.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -59,6 +61,8 @@ public static class InfrastructureServicesExtensions
                 }
             };
         });
+        services.AddScoped<IPasswordService, PasswordService>();
+        services.AddScoped<ITokenService, JwtService>();
         services.AddAuthorization(); return services;
     }
 }

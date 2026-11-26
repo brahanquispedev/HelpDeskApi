@@ -1,11 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using HelpDesk.Application.Interfaces;
 using HelpDesk.Domain.Ports;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace HelpDesk.Application.Services;
+namespace HelpDesk.Infrastructure.Services;
 
 public class JwtService : ITokenService
 {

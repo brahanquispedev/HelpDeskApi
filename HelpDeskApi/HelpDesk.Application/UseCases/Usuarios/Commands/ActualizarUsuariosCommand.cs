@@ -1,3 +1,4 @@
+using HelpDesk.Application.Interfaces;
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using HelpDesk.Domain.Dtos.Common;

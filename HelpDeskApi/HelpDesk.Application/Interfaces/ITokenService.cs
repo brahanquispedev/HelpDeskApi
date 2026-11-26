@@ -1,4 +1,6 @@
-namespace HelpDesk.Domain.Ports;
+using HelpDesk.Domain.Ports;
+
+namespace HelpDesk.Application.Interfaces;
 
 public interface ITokenService
 {
